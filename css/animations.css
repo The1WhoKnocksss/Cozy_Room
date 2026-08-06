@@ -1,0 +1,220 @@
+.clickable {
+    transition: filter 0.3s ease;
+}
+
+.clickable:hover 
+{
+  filter: 
+    drop-shadow(0 0 1px rgba(255, 255, 255, 0.7)) 
+    drop-shadow(0 0 2px rgba(255, 246, 163, 0.6)) 
+    drop-shadow(0 0 3px rgba(255, 193, 7, 0.5)) 
+    drop-shadow(0 0 4px rgba(255, 152, 0, 0.4));
+}
+
+
+.puzzle-group:hover #puzzleLeft {
+  transform: translateX(6%);
+}
+.puzzle-group:hover #puzzleRight {
+  transform: translateX(-6%);
+}
+
+
+@keyframes bearSway{
+
+0%{
+transform:rotate(0deg);
+}
+
+25%{
+transform:rotate(-1deg);
+}
+
+50%{
+transform:scale(1.03) rotate(0.5deg);
+
+}
+
+75%{
+transform:rotate(-0.5deg);
+}
+
+100%{
+transform:rotate(0deg);
+}
+
+}
+
+#bear:hover{
+
+animation:bearSway .7s ease;
+
+}
+
+#album{
+
+transition:.25s;
+
+}
+
+#album:hover{
+
+transform:
+
+translateY(-6px)
+
+rotate(-4deg);
+
+}
+
+
+
+
+
+@keyframes dino {
+    50%{
+        transform: translateY(-4px) rotate(-7deg);
+    }
+}
+#dino:hover{
+    animation:dino .5s ease;
+}
+
+
+@keyframes moon{
+
+0%{
+
+opacity:.92;
+
+}
+
+50%{
+
+opacity:1;
+
+}
+
+100%{
+
+opacity:.92;
+
+}
+
+}
+
+#moon:hover{
+    animation:moon .5s ease;
+}
+
+
+#player{
+    transition: transform .25s ease;
+}
+
+#player:hover{
+    transform: translateY(-1%);
+}
+
+
+#cat{
+
+    transform-origin: center bottom;
+
+    animation: catBreathing 4.5s ease-in-out infinite;
+
+}
+
+@keyframes catBreathing{
+
+    0%{
+        transform: scaleX(1) scaleY(1);
+    }
+
+    50%{
+        transform: scaleX(1.01) scaleY(0.975);
+    }
+
+    100%{
+        transform: scaleX(1) scaleY(1);
+    }
+
+}
+
+
+#duck{
+
+    cursor:pointer;
+
+    transform-origin:center bottom;
+
+    transition:transform .18s ease;
+
+}
+
+/* Немного сжимается при наведении */
+
+#duck:hover{
+
+    transform:scaleX(1.03) scaleY(0.96);
+
+}
+
+/* Во время клика */
+
+#duck.pressed{
+
+    animation:duckPress .25s ease;
+
+}
+
+@keyframes duckPress{
+
+    0%{
+        transform:scaleX(1.03) scaleY(0.96) rotate(0deg);
+    }
+
+    30%{
+        transform:scaleX(1.08) scaleY(0.82) rotate(-4deg);
+    }
+
+    55%{
+        transform:scaleX(.97) scaleY(1.05) rotate(4deg);
+    }
+
+    75%{
+        transform:scaleX(1.02) scaleY(.98) rotate(-2deg);
+    }
+
+    100%{
+        transform:scaleX(1.03) scaleY(0.96) rotate(0deg);
+    }
+
+}
+
+
+#popup-toast {
+  position: fixed;
+  bottom: 40px; /* Отступ от нижнего края */
+  left: 50%;
+  transform: translateX(-50%) translateY(500px) scale(0.6) rotate(-10deg);
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Увеличенный размер картинки */
+#popup-toast img {
+  width: 450px; 
+  max-width: 90vw; /* Защита: на мелких экранах уменьшится под размер дисплея */
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 15px 25px rgba(0,0,0,0.35)); 
+}
+
+/* Класс резкого вылета */
+#popup-toast.show {
+  transform: translateX(-50%) translateY(0) scale(1) rotate(0deg);
+  opacity: 1;
+}

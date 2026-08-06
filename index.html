@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Our Cozy Room ❤️</title>
+
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+
+</head>
+
+<body>
+
+<div id="room">
+
+    <!-- ========================= -->
+    <!-- ФОН -->
+    <!-- ========================= -->
+
+    <img id="background" class="layer"
+         src="assets/background.png" alt="">
+
+
+    <!-- ========================= -->
+    <!-- ПОЛКА -->
+    <!-- ========================= -->
+
+    <img id="shelf"
+         class="object"
+         src="assets/shelf.png"
+         alt="">
+
+
+    <img id="jar"
+         class="object clickable"
+         src="assets/jar.png"
+         alt="">
+
+     <div class="yarns-container">
+          <img 
+               src="assets/star.png"
+               alt=""
+               class="star-sprite first">
+          <img 
+               src="assets/star.png"
+               alt=""
+               class="star-sprite second">
+    <img id="yarns"
+         class="object clickable"
+         src="assets/yarns.png"
+         alt="">
+     </div>
+
+
+
+    <!-- ========================= -->
+    <!-- ОКНО -->
+    <!-- ========================= -->
+
+    <img id="window"
+         class="object"
+         src="assets/window_frame.png"
+         alt="">
+
+     <div id="sky"> 
+    <img id="moon"
+         class="object clickable"
+         src="assets/moon.png"
+         alt="">
+         <div id="rain"></div>
+          </div>
+
+<div class="flower-container object clickable">
+    <!-- Картинка горшка -->
+    <img id="pot" src="assets/flower_states/pot.png" alt="Горшок">
+    <!-- Картинка растения (меняется динамически) -->
+    <img id="plant" src="assets/flower_states/flower_state1.png" alt="Растение">
+</div>
+
+
+
+    <img id="dino"
+         class="object clickable"
+         src="assets/dino.png"
+         alt="">
+
+
+
+    <!-- ========================= -->
+    <!-- ЛАМПА -->
+    <!-- ========================= -->
+
+    <div class="lamp-light"></div>
+    <img id="lamp"
+         class="object"
+         src="assets/lamp.png"
+         alt="">
+     <img id="lamp_bulb"
+         class="object clickable"
+         src="assets/lamp_bulb.png"
+         alt="">
+     
+
+
+
+    <!-- ========================= -->
+    <!-- СТОЛ -->
+    <!-- ========================= -->
+
+    <img id="desk"
+         class="layer"
+         src="assets/desk.png"
+         alt="">
+
+
+
+    <!-- ========================= -->
+    <!-- КРЕСЛО -->
+    <!-- ========================= -->
+
+    <img id="chairBack"
+         class="layer"
+         src="assets/chair_back.png"
+         alt="">
+
+
+    <img id="bear"
+         class="object clickable"
+         src="assets/teddy.png"
+         alt="">
+
+
+    <img id="chairFront"
+         class="layer"
+         src="assets/chair_front.png"
+         alt="">
+
+
+
+    <!-- ========================= -->
+    <!-- КОТ -->
+    <!-- ========================= -->
+     <div id="catContainer">
+    <img id="cat"
+         class="object clickable"
+         src="assets/cat.png"
+         alt="">
+
+          <span class="sleep z1">Z</span>
+          <span class="sleep z2">Z</span>
+          <span class="sleep z3">Z</span>
+
+     </div>
+
+
+
+    <!-- ========================= -->
+    <!-- КРУЖКА -->
+    <!-- ========================= -->
+     <div id="cupContainer">
+     <img id="cup"
+         class="object clickable"
+         src="assets/cup.png"
+         alt="">
+
+          <span class="steam s1"></span>
+          <span class="steam s2"></span>
+          <span class="steam s3"></span>
+
+     </div>
+     
+
+
+    <!-- ========================= -->
+    <!-- ПИЦЦА -->
+    <!-- ========================= -->
+
+    <img id="plate"
+         class="object"
+         src="assets/plate.png"
+         alt="">
+
+
+    <img id="pizza"
+         class="object clickable"
+         src="assets/pizza.png"
+         alt="">
+
+
+
+    <!-- ========================= -->
+    <!-- ПАЗЛЫ -->
+    <!-- ========================= -->
+     <div class="puzzle-group clickable">
+     <img id="puzzleLeft"
+         class="object clickable"
+         src="assets/puzzle_left.png"
+         alt="">
+
+
+     <img id="puzzleRight"
+         class="object clickable"
+         src="assets/puzzle_right.png"
+         alt="">
+     </div>
+
+
+
+    <!-- ========================= -->
+    <!-- УТОЧКА -->
+    <!-- ========================= -->
+
+    <img id="duck"
+         class="object clickable"
+         src="assets/duck.png"
+         alt="">
+
+
+
+    <!-- ========================= -->
+    <!-- MP3 -->
+    <!-- ========================= -->
+
+    <img id="player"
+         class="object clickable"
+         src="assets/player.png"
+         alt="">
+
+
+
+    <!-- ========================= -->
+    <!-- АЛЬБОМ -->
+    <!-- ========================= -->
+
+    <img id="album"
+         class="object clickable"
+         src="assets/album.png"
+         alt="">
+
+
+
+    <!-- ========================= -->
+    <!-- ОСВЕЩЕНИЕ -->
+    <!-- ========================= -->
+
+    <div id="dayOverlay"></div>
+
+    <div id="nightOverlay"></div>
+
+    <div id="lampLight"></div>
+
+    <canvas id="weather"></canvas>
+
+    <div id="particles"></div>
+
+
+
+    <!-- ========================= -->
+    <!-- ПОДСКАЗКИ -->
+    <!-- ========================= -->
+
+    <div id="eyeHints"></div>
+
+
+
+    <!-- ========================= -->
+    <!-- ЗАПИСКИ -->
+    <!-- ========================= -->
+
+    <div id="noteContainer"></div>
+
+
+
+    <!-- ========================= -->
+    <!-- АУДИО -->
+    <!-- ========================= -->
+
+
+     <audio id="R-R-R" src="audio/R-R-R_1.mp3" preload="auto"></audio>
+     <audio id="Mr-Mr-Mr" src="audio/Mr-Mr-Mr_1.mp3" preload="auto"></audio>
+
+    <audio id="musicPlayer"></audio>
+
+    <audio id="voicePlayer"></audio>
+
+    <audio id="soundPlayer"></audio>
+    <audio id="duckSound" src="audio/duck.mp3"></audio>
+
+
+</div>
+<div id="lighting"></div>
+<div class="vignette"></div>
+<div class="dust-container"></div>
+<div id="moonLight"></div>
+
+<div id="noteOverlay">
+
+    <div id="darkness"></div>
+
+    <img id="noteImage" src="">
+
+</div>
+
+<div id="popup-toast">
+  <img src="assets/yarns_note/yarns_note.png" alt="Всплывающее уведомление">
+</div>
+
+<div id="duckOverlay">
+
+    <div class="darkness"></div>
+
+    <img id="duckNote" src="assets/duck_note/duck_note.png">
+
+</div>
+
+<!-- Оверлей для страницы альбома (изначально скрыт) -->
+<div id="album-page-overlay">
+    <img id="album-page-img" src="" alt="Страница альбома">
+</div>
+
+
+
+<div id="playerOverlay">
+    <div class="darkness"></div>
+    <!-- Сюда вставьте путь к новой картинке, которая должна появиться -->
+    <img id="playerNote" src="assets/mp3player/mp3player.png"> 
+</div>
+
+<!-- Контейнер для всплывающих записок пиццы -->
+<div id="pizzaCardOverlay">
+    <img id="pizzaCard" src="assets/card1.png" alt="Записка">
+</div>
+
+
+<div id="cupNoteOverlay" class="cup-note-backdrop">
+  <img id="cupNoteImage" class="cup-note-paper" src="" alt="Записка чашки">
+</div>
+
+
+<!-- Оверлей для записки цветка -->
+<div id="flowerNoteOverlay" class="flower-note-backdrop">
+  <!-- Картинка вашей фиксированной записки -->
+  <img id="flowerNoteImage" class="flower-note-paper" src="assets/flower_states/квіточка.png" alt="Записка цветка">
+</div>
+
+
+
+<audio id="playerMusic" loop></audio>
+
+
+
+<audio id="BG" src="audio/room.mp3" loop></audio>
+
+
+<audio id="hover-audio" src="audio/hover2.mp3" preload="auto"></audio>
+
+
+<audio id="Teddy_note_audio" src="audio/Teddy_note.wav"></audio>
+<audio id="Cup_audio" src="audio/Cup_notes.wav"></audio>
+<audio id="Album_audio" src="audio/Album_note.wav"></audio>
+<audio id="Plant_audio" src="audio/Plant_note.wav"></audio>
+<audio id="Pizza_audio" src="audio/Pizza_audio.mp3"></audio>
+<audio id="Yarns_audio" src="audio/Yarns_audio.mp3"></audio>
+<audio id="Lamp_audio" src="audio/lamp_audio.mp3"></audio>
+
+
+<script src="js/main.js"></script>
+<script src="js/weather.js"></script>
+<script src="js/interactions.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/notes.js"></script>
+<script src="js/editor.js"></script>
+
+</body>
+</html>
