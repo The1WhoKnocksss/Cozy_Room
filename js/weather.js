@@ -2,6 +2,14 @@ const MOSCOW_LAT = 55.7522;
 const MOSCOW_LON = 37.6156;
 let isRaining = false; 
 
+// Элементы аудио
+const dayBirdsAudio = document.getElementById('day-birds');
+const nightCricketsAudio = document.getElementById('night-crickets');
+
+// Установка низкой громкости (10%)
+if (dayBirdsAudio) dayBirdsAudio.volume = 0.1;
+if (nightCricketsAudio) nightCricketsAudio.volume = 0.1;
+
 function blendColors(color1, color2, percentage) {
   const r1 = parseInt(color1.substring(1, 3), 16);
   const g1 = parseInt(color1.substring(3, 5), 16);
@@ -38,7 +46,6 @@ function toggleRainEffect(enable) {
   }
 }
 
-// ОБНОВЛЕННАЯ ФУНКЦИЯ ПРОВЕРКИ ПОГОДЫ С ЛОГАМИ
 async function checkWeather() {
   try {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${MOSCOW_LAT}&longitude=${MOSCOW_LON}&current=rain,showers`;
@@ -46,7 +53,6 @@ async function checkWeather() {
     const data = await response.json();
     isRaining = data.current.rain > 0 || data.current.showers > 0;
 
-    // Вывод лога в консоль браузера
     if (isRaining) {
       console.log("В Москве сейчас идет дождь 🌧️");
     } else {
@@ -126,6 +132,34 @@ function updateDynamicSky() {
     moon.classList.remove('active-clicks');
   }
 }
+
+/**
+ * Логика случайного проигрывания фоновых звуков
+ */
+function scheduleAmbientSound() {
+  const currentHour = new Date().getHours();
+  const isNight = currentHour >= 21 || currentHour < 6;
+
+  // Попытка воспроизведения звука
+  if (isNight) {
+    if (nightCricketsAudio) {
+      nightCricketsAudio.currentTime = 0;
+      nightCricketsAudio.play().catch(() => {});
+    }
+  } else {
+    if (dayBirdsAudio) {
+      dayBirdsAudio.currentTime = 0;
+      dayBirdsAudio.play().catch(() => {});
+    }
+  }
+
+  // Генерация случайной задержки от 4 до 6 минут (в миллисекундах)
+  const randomDelay = (4 + Math.random() * 2) * 60 * 1000;
+  setTimeout(scheduleAmbientSound, randomDelay);
+}
+
+// Запуск первой случайной проверки через 1–2 минуты после загрузки
+setTimeout(scheduleAmbientSound, (1 + Math.random()) * 60 * 1000);
 
 // МГНОВЕННАЯ ИНИЦИАЛИЗАЦИЯ БЕЗ ПЕРЕХОДНОГО ЭФФЕКТА
 document.body.classList.add('no-transition');

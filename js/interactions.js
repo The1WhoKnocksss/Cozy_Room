@@ -167,3 +167,217 @@ if (lampBulb && lampLight) {
         }
     });
 }
+
+
+const jar = document.getElementById('jar');
+const jarAudio = document.getElementById('Jar_audio');
+const jarBreakAudio = document.getElementById('Jar_break_audio');
+const bflyAudio = document.getElementById('Bfly_audio');
+
+jarAudio.volume = 0.3;
+jarBreakAudio.volume = 0.5;
+bflyAudio.volume = 0.4;
+
+const maxClicks = Math.floor(Math.random() * (7 - 4 + 1)) + 4;
+let currentClicks = 0;
+let isFalling = false;
+
+const butterflyImages = ['assets/BF1.png', 'assets/BF2.png'];
+
+// --- ПРОВЕРКА: Разбирал ли пользователь банку сегодня ---
+const today = new Date().toDateString(); // Например: "Fri Aug 07 2026"
+const lastBreakDate = localStorage.getItem('jar_last_break_date');
+
+if (lastBreakDate === today) {
+    // Если банка уже разбита сегодня — скрываем её полностью
+    jar.style.display = 'none';
+}
+
+/**
+ * Хаотичный бесконечный полёт бабочки по экрану
+ */
+function startRandomFlight(bFly) {
+    bFly.style.zIndex = '9999';
+
+    const targetX = (10 + Math.random() * 80) * (window.innerWidth / 100);
+    const targetY = (10 + Math.random() * 80) * (window.innerHeight / 100);
+
+    const currentLeft = parseFloat(bFly.style.left);
+    const currentTop = parseFloat(bFly.style.top);
+
+    const deltaX = targetX - currentLeft;
+    const deltaY = targetY - currentTop;
+    const angle = Math.atan2(deltaY, deltaX);
+    const rotateDeg = (angle + Math.PI / 2) * (180 / Math.PI);
+
+    const duration = 3000 + Math.random() * 3000;
+
+    const anim = bFly.animate([
+        { 
+            left: `${currentLeft}px`, 
+            top: `${currentTop}px`,
+            transform: `rotate(${rotateDeg}deg)`
+        },
+        { 
+            left: `${targetX}px`, 
+            top: `${targetY}px`,
+            transform: `rotate(${rotateDeg}deg)`
+        }
+    ], {
+        duration: duration,
+        easing: 'ease-in-out',
+        fill: 'forwards'
+    });
+
+    anim.onfinish = () => {
+        bFly.style.left = `${targetX}px`;
+        bFly.style.top = `${targetY}px`;
+        startRandomFlight(bFly);
+    };
+}
+
+/**
+ * Массовый вылет бабочек
+ */
+function createButterflyBurst(x, y, count = 55) {
+    const container = document.body;
+    const vw = window.innerWidth / 100;
+
+    for (let i = 0; i < count; i++) {
+        const bFly = document.createElement('div');
+        bFly.className = 'butterfly';
+
+        const img = document.createElement('img');
+        img.src = butterflyImages[Math.floor(Math.random() * butterflyImages.length)];
+        img.className = 'butterfly-img';
+        bFly.appendChild(img);
+
+        bFly.style.left = `${x}px`;
+        bFly.style.top = `${y}px`;
+        container.appendChild(bFly);
+
+        const scale = 0.5 + Math.random() * 0.9;
+        const angle = -Math.PI / 2 + (Math.random() - 0.5) * (Math.PI * 0.25);
+        const dist = (25 + Math.random() * 35) * vw; 
+        const deltaX = Math.cos(angle) * dist;
+        const deltaY = Math.sin(angle) * dist;
+
+        const baseRotate = (angle + Math.PI / 2) * (180 / Math.PI);
+        const turns = (Math.random() > 0.5 ? 1 : -1) * (2 + Math.floor(Math.random() * 3));
+        const endRotateY = turns * 360;
+
+        const isStaying = i >= (count - 3);
+
+        if (isStaying) {
+            bFly.classList.add('staying-butterfly');
+        }
+
+        const animation = bFly.animate([
+            {
+                transform: `translate(0, 0) scale(0) rotate(${baseRotate}deg) rotateY(0deg)`,
+                opacity: 0,
+                offset: 0
+            },
+            {
+                transform: `translate(0, 0) scale(${scale}) rotate(${baseRotate}deg) rotateY(${endRotateY * 0.1}deg)`,
+                opacity: 1,
+                offset: 0.1
+            },
+            {
+                transform: `translate(${deltaX * 0.85}px, ${deltaY * 0.85}px) scale(${scale}) rotate(${baseRotate}deg) rotateY(${endRotateY * 0.85}deg)`,
+                opacity: 1,
+                offset: 0.85
+            },
+            {
+                transform: `translate(${deltaX}px, ${deltaY}px) scale(${scale}) rotate(${baseRotate}deg) rotateY(${endRotateY}deg)`,
+                opacity: isStaying ? 1 : 0,
+                offset: 1
+            }
+        ], {
+            duration: 4000 + Math.random() * 1500,
+            easing: 'ease-out',
+            fill: 'forwards'
+        });
+
+        animation.onfinish = () => {
+            if (isStaying) {
+                bFly.style.left = `${x + deltaX}px`;
+                bFly.style.top = `${y + deltaY}px`;
+                startRandomFlight(bFly);
+            } else {
+                bFly.remove();
+            }
+        };
+    }
+}
+
+// Обработка кликов по банке
+jar.addEventListener('click', () => {
+    if (isFalling) return;
+
+    currentClicks++;
+
+    if (currentClicks >= maxClicks) {
+        isFalling = true;
+
+        // СОХРАНЯЕМ ДАТУ: заносим сегодняшнее число в память браузера
+        localStorage.setItem('jar_last_break_date', new Date().toDateString());
+
+        jar.style.zIndex = '-1';
+        jar.style.pointerEvents = 'none';
+
+        jar.animate([
+            { transform: 'translateY(0px) rotate(0deg)', opacity: 1 },
+            { transform: 'translateY(5vh) rotate(30deg)', opacity: 1, offset: 0.2 },
+            { transform: 'translateY(110vh) rotate(180deg)', opacity: 0 }
+        ], {
+            duration: 800,
+            easing: 'ease-in',
+            fill: 'forwards'
+        });
+
+        setTimeout(() => {
+            jarBreakAudio.currentTime = 0;
+            jarBreakAudio.play();
+
+            bflyAudio.currentTime = 0;
+            bflyAudio.loop = true;
+            bflyAudio.volume = 0.4;
+            bflyAudio.play();
+
+            const jarRect = jar.getBoundingClientRect();
+            const bottomX = jarRect.left + jarRect.width / 2;
+            const bottomY = window.innerHeight * 0.85;
+
+            createButterflyBurst(bottomX, bottomY, 55);
+
+            setTimeout(() => {
+                let fadeInterval = setInterval(() => {
+                    if (bflyAudio.volume > 0.05) {
+                        bflyAudio.volume -= 0.05;
+                    } else {
+                        clearInterval(fadeInterval);
+                        bflyAudio.pause();
+                        bflyAudio.loop = false;
+                    }
+                }, 100);
+            }, 4000);
+
+        }, 600);
+
+    } else {
+        jarAudio.currentTime = 0;
+        jarAudio.play();
+
+        jar.animate([
+            { transform: 'rotate(0deg)' },
+            { transform: 'rotate(-8deg)' },
+            { transform: 'rotate(6deg)' },
+            { transform: 'rotate(-4deg)' },
+            { transform: 'rotate(0deg)' }
+        ], {
+            duration: 400,
+            easing: 'ease-in-out'
+        });
+    }
+});

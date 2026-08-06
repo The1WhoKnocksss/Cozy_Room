@@ -74,7 +74,7 @@ body{
 
     width:100%;
     height:100%;
-
+    z-index: -2;
     object-fit:cover;
 
 }
@@ -94,14 +94,95 @@ body{
 
 }
 
-#jar{
-
-    left:22%;
+#jar {
+    display: block;
+    position: absolute;
+    left: 22%;
     top: 3%;
-    z-index: 1; 
-    width:9%;
+    z-index: 2; 
+    width: 9%;
+    transform-origin: 50% 50% !important; /* Строго по центру */
+}
+
+#jar.shake {
+    animation: sway 0.5s ease-in-out;
+}
+
+/* Жесткий сброс для падения */
+#jar.fall {
+    transition: none !important; /* Отключаем транзишны! */
+    animation: fall 0.8s ease-in forwards !important; 
+    pointer-events: none !important;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+        opacity: 1;
+    }
+    30% {
+        transform: translateY(100px) rotate(40deg);
+        opacity: 1;
+    }
+    100% {
+        /* Добавлен translateZ(0) для принудительного 3D-рендеринга */
+        transform: translateY(700px) rotate(180deg) translateZ(0);
+        opacity: 0 !important;
+        visibility: hidden;
+    }
+}
+
+@keyframes sway {
+    0%   { transform: rotate(0deg); }
+    20%  { transform: rotate(-6deg); }
+    40%  { transform: rotate(4deg); }
+    60%  { transform: rotate(-3deg); }
+    80%  { transform: rotate(3deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* Стили для бабочек */
+.butterfly {
+    position: absolute;
+    width: 6vmin;
+    height: 6vmin;
+    z-index: -2;
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform, left, top;
+    transform-style: preserve-3d;
+    
+    /* Нежная розовая подсветка вокруг рисунка */
+    filter: drop-shadow(0 0 8px rgba(232, 93, 204, 0.8));
+}
+
+.butterfly-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Усиленное свечение для остающихся бабочек */
+.staying-butterfly {
+    /* Яркая двойная подсветка */
+    filter: drop-shadow(0 0 12px rgba(255, 105, 180, 1)) 
+            drop-shadow(0 0 25px rgba(232, 93, 204, 0.9)) !important;
 
 }
+
+/* Бесконечный цикл покачивания/взмахов крыльев во время свободного полёта */
+.staying-butterfly img {
+    animation: gentleFlap 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes gentleFlap {
+    0% { transform: scaleX(1); }
+    100% { transform: scaleX(0.4); } /* Имитация взмаха в 2D/3D */
+}
+
+
+
+
 
 /* Контейнер для игрушек и звёзд */
 .yarns-container {
@@ -420,7 +501,7 @@ body{
 
     left:17%;
     top:1%;
-    z-index: 1;
+    z-index: 2;
     width:33%;
     pointer-events:none;
 
@@ -430,7 +511,7 @@ body{
 
     left:39.3%;
     top:21.9%;
-    z-index: 11;
+    z-index: 3;
     width:8%;
 
 }
@@ -525,7 +606,7 @@ body{
 
     left:1.5%;
     top:49%;
-
+    z-index: -1;
     width:97%;
 
 }
@@ -667,6 +748,7 @@ body{
     top: 49%;
     width: 20%;
     overflow: visible;
+    z-index: 2;
 }
 
 /* Сама картинка чашки */
