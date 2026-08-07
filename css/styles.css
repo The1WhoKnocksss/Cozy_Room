@@ -576,8 +576,8 @@ body{
 /* ОБЩИЙ КОНТЕЙНЕР СВЕТА (Базовая точка на лампочке) */
 .lamp-light {
     position: absolute;
-    width: 800px;  
-    height: 800px;
+    width: 42%;  /* 800px от ширины 1920px */
+    height: 74%; /* 800px от высоты 1080px */
     left: 43.1%;
     top: 24%;
     pointer-events: none;
