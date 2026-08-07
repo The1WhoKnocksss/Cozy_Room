@@ -365,36 +365,28 @@ body{
 }
 
 
-#moonLight{
+#moonLight {
+  position: absolute;
+  right: 5%;
+  top: 5%;
+  width: 45%;
+  height: 70%;
+  pointer-events: none;
+  z-index: 11;
 
-    position:absolute;
+  /* Увеличена прозрачность с 0.12 до 0.45, чтобы свечение стало отчетливым */
+  background: radial-gradient(
+    circle,
+    rgba(170, 210, 255, 0.45) 0%,
+    rgba(170, 210, 255, 0.15) 50%,
+    transparent 70%
+  );
 
-    right:5%;
-    top:5%;
+  /* Снижено размытие с 45px до 25px для сохранения видимой формы свечения */
+  filter: blur(25px);
 
-    width:45%;
-    height:70%;
-
-    pointer-events:none;
-
-    background:radial-gradient(
-
-        circle,
-
-        rgba(170,210,255,.12),
-
-        rgba(170,210,255,.05),
-
-        transparent 70%
-
-    );
-
-    filter:blur(45px);
-
-    opacity:1;
-    z-index: 11;
-    transition:2s;
-
+  opacity: 1;
+  transition: opacity 2s ease-in-out;
 }
 
 

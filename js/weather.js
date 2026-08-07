@@ -70,6 +70,7 @@ function updateDynamicSky() {
   const sky = document.getElementById('sky');
   const moon = document.getElementById('moon');
   const lighting = document.getElementById('lighting');
+  const moonLight = document.getElementById('moonLight'); // Добавлен элемент свечения
   if (!sky || !moon || !lighting) return;
 
   const now = new Date();
@@ -114,6 +115,7 @@ function updateDynamicSky() {
   lighting.style.background = hexToRgba(blendedLightHex, currentAlpha);
   lighting.style.filter = `brightness(${currentBrightness}%)`;
 
+  // Расчет прозрачности для луны и ее освещения
   let moonOpacity = 0;
   if (minutesInDay >= 1260 && minutesInDay < 1290) { 
     moonOpacity = (minutesInDay - 1260) / 30;
@@ -124,7 +126,13 @@ function updateDynamicSky() {
   } else {
     moonOpacity = 0;
   }
+
   moon.style.opacity = moonOpacity;
+
+  // Плавная синхронизация свечения #moonLight с прозрачностью луны
+  if (moonLight) {
+    moonLight.style.opacity = moonOpacity;
+  }
 
   if (currentHour >= 21 || currentHour < 6) {
     moon.classList.add('active-clicks');
@@ -140,7 +148,6 @@ function scheduleAmbientSound() {
   const currentHour = new Date().getHours();
   const isNight = currentHour >= 21 || currentHour < 6;
 
-  // Попытка воспроизведения звука
   if (isNight) {
     if (nightCricketsAudio) {
       nightCricketsAudio.currentTime = 0;
@@ -153,7 +160,6 @@ function scheduleAmbientSound() {
     }
   }
 
-  // Генерация случайной задержки от 4 до 6 минут (в миллисекундах)
   const randomDelay = (4 + Math.random() * 2) * 60 * 1000;
   setTimeout(scheduleAmbientSound, randomDelay);
 }
