@@ -381,3 +381,148 @@ jar.addEventListener('click', () => {
         });
     }
 });
+
+// === ЛОГИКА ОКНА ЛУНЫ И СКАЗОК ===
+document.addEventListener('DOMContentLoaded', () => {
+  const moonBtn = document.getElementById('moon');
+  const moonOverlay = document.getElementById('moon-modal-overlay');
+
+  // Укажи здесь точные пути и имена файлов сказок из папки audio/Moon/
+  const fairyTalesList = [
+  'audio/Moon/1.ogg',
+  'audio/Moon/2.ogg',
+  'audio/Moon/3.ogg',
+  'audio/Moon/4.ogg',
+  'audio/Moon/5.ogg',
+  'audio/Moon/6.ogg',
+  'audio/Moon/7.ogg'
+  ];
+
+  let currentStoryAudio = null;
+  let storyTimeoutId = null;
+  let fadeIntervalId = null;
+
+  // Функция плавной смены громкости
+  function fadeVolume(audio, targetVolume, duration = 2000, onComplete = null) {
+    if (fadeIntervalId) clearInterval(fadeIntervalId);
+    const startVolume = audio.volume;
+    const steps = 30;
+    const stepTime = duration / steps;
+    const volumeChange = (targetVolume - startVolume) / steps;
+    let currentStep = 0;
+
+    fadeIntervalId = setInterval(() => {
+      currentStep++;
+      const newVol = startVolume + (volumeChange * currentStep);
+      audio.volume = Math.min(1, Math.max(0, newVol));
+
+      if (currentStep >= steps) {
+        clearInterval(fadeIntervalId);
+        audio.volume = targetVolume;
+        if (onComplete) onComplete();
+      }
+    }, stepTime);
+  }
+
+  // Приглушение/восстановление остальных звуков на странице
+  function setOtherAudioVolume(isDumbed) {
+    const allAudio = document.querySelectorAll('audio');
+    allAudio.forEach(audio => {
+      if (audio !== currentStoryAudio) {
+        if (!audio.dataset.originalVolume) {
+          audio.dataset.originalVolume = audio.volume || 0.1;
+        }
+        const baseVol = parseFloat(audio.dataset.originalVolume);
+        // В 5 раз тише (умножаем на 0.2)
+        audio.volume = isDumbed ? baseVol * 0.2 : baseVol;
+      }
+    });
+  }
+
+  // Выбор сказки дня (1 сказка на дату)
+  function getDailyFairyTale() {
+    if (!fairyTalesList.length) return null;
+    
+    const today = new Date().toISOString().split('T')[0]; // Формат YYYY-MM-DD
+    const savedDate = localStorage.getItem('moon_story_date');
+    const savedStory = localStorage.getItem('moon_story_path');
+
+    if (savedDate === today && savedStory && fairyTalesList.includes(savedStory)) {
+      return savedStory;
+    }
+
+    const randomIndex = Math.floor(Math.random() * fairyTalesList.length);
+    const selectedStory = fairyTalesList[randomIndex];
+
+    localStorage.setItem('moon_story_date', today);
+    localStorage.setItem('moon_story_path', selectedStory);
+
+    return selectedStory;
+  }
+
+  // Остановка сказки и закрытие окна
+  function stopFairyTale() {
+    if (storyTimeoutId) {
+      clearTimeout(storyTimeoutId);
+      storyTimeoutId = null;
+    }
+
+    setOtherAudioVolume(false); // Возвращаем громкость остальным звукам
+
+    if (currentStoryAudio) {
+      fadeVolume(currentStoryAudio, 0, 1000, () => {
+        currentStoryAudio.pause();
+        currentStoryAudio.currentTime = 0;
+      });
+    }
+  }
+
+  if (moonBtn && moonOverlay) {
+    // Открытие окна по клику на луну
+    moonBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      moonOverlay.classList.add('moon-modal-active');
+
+      const storyPath = getDailyFairyTale();
+      if (!storyPath) return;
+
+      // Запуск сказки через 3 секунды
+      storyTimeoutId = setTimeout(() => {
+        if (!moonOverlay.classList.contains('moon-modal-active')) return;
+
+        setOtherAudioVolume(true); // Все остальные звуки становятся в 5 раз тише
+
+        currentStoryAudio = new Audio(storyPath);
+        currentStoryAudio.volume = 0;
+        
+        // Автоматическое закрытие меню при окончании аудио
+        currentStoryAudio.onended = () => {
+          moonOverlay.classList.remove('moon-modal-active');
+          stopFairyTale();
+        };
+
+        currentStoryAudio.play().then(() => {
+          // Плавный разгон громкости от 0 до 0.15
+          fadeVolume(currentStoryAudio, 0.15, 2500);
+        }).catch(err => console.log("Автовоспроизведение заблокировано браузером:", err));
+
+      }, 3000);
+    });
+
+    // Закрытие при клике по фону
+    moonOverlay.addEventListener('click', (e) => {
+      if (e.target === moonOverlay || e.target.classList.contains('moon-modal-content')) {
+        moonOverlay.classList.remove('moon-modal-active');
+        stopFairyTale();
+      }
+    });
+
+    // Закрытие по клавише Escape
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && moonOverlay.classList.contains('moon-modal-active')) {
+        moonOverlay.classList.remove('moon-modal-active');
+        stopFairyTale();
+      }
+    });
+  }
+});

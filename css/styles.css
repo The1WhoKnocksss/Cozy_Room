@@ -308,6 +308,63 @@ body{
   pointer-events: auto; /* Ночью на луну снова можно кликать */
 }   
 
+/* Уникальный оверлей для луны */
+.moon-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* Холодное глубокое сине-голубое затемнение */
+  background: rgba(7, 18, 38, 0.82);
+  /* Размытие фона */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+
+  /* Скрытие по умолчанию */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease, backdrop-filter 0.4s ease;
+}
+
+/* Состояние при открытии */
+.moon-modal-overlay.moon-modal-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Контейнер и обертка модалки */
+.moon-modal-content {
+  position: relative;
+  max-width: 85vw;
+  max-height: 85vh;
+  perspective: 1000px;
+}
+
+/* Изображение с эффектом поворота и масштабирования */
+.moon-modal-image {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  display: block;
+
+
+  /* Начальное положение: чуть меньше и повернуто на -8 градусов */
+  transform: scale(0.7) rotate(-8deg);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+}
+
+/* Поворот и выравнивание при вызове окна */
+.moon-modal-overlay.moon-modal-active .moon-modal-image {
+  transform: scale(1) rotate(0deg);
+}
+
+
 #moonLight{
 
     position:absolute;
@@ -1457,7 +1514,7 @@ rgba(0,0,0,.18)
     transition:
         opacity 0.8s ease,
         transform 0.8s ease;
-        
+
     cursor: pointer;
 
 }
