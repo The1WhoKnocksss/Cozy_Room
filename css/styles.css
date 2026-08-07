@@ -1548,3 +1548,38 @@ rgba(0,0,0,.18)
     transition: transform 0.8s ease;
 
 }
+
+#windowLight {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+
+    background: radial-gradient(
+        ellipse 40% 55% at 72% 25%,
+        rgba(255, 220, 130, 0.45) 0%,
+        rgba(255, 220, 130, 0.20) 35%,
+        rgba(255, 220, 130, 0.05) 60%,
+        transparent 100%
+    );
+
+    z-index: 11;
+    /* Плавно переключаем прозрачность из JS */
+    transition: opacity 1s ease;
+    animation: windowLightMove 8s ease-in-out infinite;
+}
+
+/* Из анимации убрана opacity, чтобы она отвечала только за легкое покачивание */
+@keyframes windowLightMove {
+    0% {
+        transform: translateX(-3%);
+    }
+    50% {
+        transform: translateX(3%);
+    }
+    100% {
+        transform: translateX(-3%);
+    }
+}

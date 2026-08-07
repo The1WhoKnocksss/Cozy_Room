@@ -503,7 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentStoryAudio.play().then(() => {
           // Плавный разгон громкости от 0 до 0.15
-          fadeVolume(currentStoryAudio, 0.15, 2500);
+          fadeVolume(currentStoryAudio, 0.5, 2500);
         }).catch(err => console.log("Автовоспроизведение заблокировано браузером:", err));
 
       }, 3000);

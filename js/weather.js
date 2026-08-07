@@ -70,7 +70,9 @@ function updateDynamicSky() {
   const sky = document.getElementById('sky');
   const moon = document.getElementById('moon');
   const lighting = document.getElementById('lighting');
-  const moonLight = document.getElementById('moonLight'); // Добавлен элемент свечения
+  const moonLight = document.getElementById('moonLight');
+  const windowLight = document.getElementById('windowLight'); // Свет из окна
+
   if (!sky || !moon || !lighting) return;
 
   const now = new Date();
@@ -115,7 +117,7 @@ function updateDynamicSky() {
   lighting.style.background = hexToRgba(blendedLightHex, currentAlpha);
   lighting.style.filter = `brightness(${currentBrightness}%)`;
 
-  // Расчет прозрачности для луны и ее освещения
+  // === РАСЧЕТ ДЛЯ ЛУНЫ И НОЧНОГО СВЕТА ===
   let moonOpacity = 0;
   if (minutesInDay >= 1260 && minutesInDay < 1290) { 
     moonOpacity = (minutesInDay - 1260) / 30;
@@ -128,10 +130,33 @@ function updateDynamicSky() {
   }
 
   moon.style.opacity = moonOpacity;
-
-  // Плавная синхронизация свечения #moonLight с прозрачностью луны
   if (moonLight) {
     moonLight.style.opacity = moonOpacity;
+  }
+
+  // === РАСЧЕТ ДЛЯ ДНЕВНОГО СВЕТА ИЗ ОКНА (#windowLight) ===
+if (windowLight) {
+  let windowOpacity = 0;
+
+  if (minutesInDay >= 360 && minutesInDay < 540) {
+    // Утро (06:00 - 09:00): плавный рост от 0.2 до 0.6
+    windowOpacity = 0.2 + ((minutesInDay - 360) / 180) * 0.4;
+  } else if (minutesInDay >= 540 && minutesInDay < 1020) {
+    // День (09:00 - 17:00): максимум (0.6)
+    windowOpacity = 0.6;
+  } else if (minutesInDay >= 1020 && minutesInDay < 1260) {
+    // Вечер (17:00 - 21:00): плавное угасание с 0.6 до 0
+    windowOpacity = 0.6 - ((minutesInDay - 1020) / 240) * 0.6;
+  } else {
+    // Ночь (21:00 - 06:00): полностью выключен (0)
+    windowOpacity = 0;
+  }
+
+    if (isRaining) {
+      windowOpacity *= 0.6;
+    }
+
+    windowLight.style.opacity = windowOpacity;
   }
 
   if (currentHour >= 21 || currentHour < 6) {
