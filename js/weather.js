@@ -2,14 +2,48 @@ const MOSCOW_LAT = 55.7522;
 const MOSCOW_LON = 37.6156;
 let isRaining = false; 
 
-// Элементы аудио
+// === ЭЛЕМЕНТЫ DOM И АУДИО ===
 const dayBirdsAudio = document.getElementById('day-birds');
 const nightCricketsAudio = document.getElementById('night-crickets');
+const wallLamps = document.getElementById('wall_lamps');
 
-// Установка низкой громкости (10%)
+// Установка низкой громкости фоновых звуков (10%)
 if (dayBirdsAudio) dayBirdsAudio.volume = 0.1;
 if (nightCricketsAudio) nightCricketsAudio.volume = 0.1;
 
+// === СОСТОЯНИЕ ПАСХАЛКИ ДЛЯ ЛАМП ===
+let isLampsSpawnedThisSession = null;
+
+/**
+ * Проверка права на появление ламп (25% шанс, не при первом визите)
+ */
+function checkLampsSpawnEligibility() {
+  const isFirstVisit = !localStorage.getItem('cozy_room_visited');
+  if (isFirstVisit) return false;
+
+  if (isLampsSpawnedThisSession === null) {
+    const LAMPS_CHANCE = 0.2;
+    isLampsSpawnedThisSession = Math.random() < LAMPS_CHANCE;
+  }
+
+  return isLampsSpawnedThisSession;
+}
+
+/**
+ * Переключение видимости ламп в зависимости от времени суток и шанса
+ */
+function updateWallLamps() {
+  if (!wallLamps) return;
+
+  const currentHour = new Date().getHours();
+  // Вечер и ночь: с 18:00 до 06:00
+  const isEveningOrNight = currentHour >= 18 || currentHour < 6;
+
+  const shouldShowLamps = isEveningOrNight && checkLampsSpawnEligibility();
+  wallLamps.style.display = shouldShowLamps ? 'block' : 'none';
+}
+
+// === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ЦВЕТА ===
 function blendColors(color1, color2, percentage) {
   const r1 = parseInt(color1.substring(1, 3), 16);
   const g1 = parseInt(color1.substring(3, 5), 16);
@@ -30,6 +64,7 @@ function hexToRgba(hex, alpha) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+// === ЛОГИКА ДОЖДЯ И ПОГОДЫ ===
 function toggleRainEffect(enable) {
   const rainContainer = document.getElementById('rain');
   if (!rainContainer) return;
@@ -66,12 +101,13 @@ async function checkWeather() {
   }
 }
 
+// === РАСЧЕТ ДИНАМИЧЕСКОГО НЕБА И ОСВЕЩЕНИЯ ===
 function updateDynamicSky() {
   const sky = document.getElementById('sky');
   const moon = document.getElementById('moon');
   const lighting = document.getElementById('lighting');
   const moonLight = document.getElementById('moonLight');
-  const windowLight = document.getElementById('windowLight'); // Свет из окна
+  const windowLight = document.getElementById('windowLight');
 
   if (!sky || !moon || !lighting) return;
 
@@ -134,23 +170,19 @@ function updateDynamicSky() {
     moonLight.style.opacity = moonOpacity;
   }
 
-  // === РАСЧЕТ ДЛЯ ДНЕВНОГО СВЕТА ИЗ ОКНА (#windowLight) ===
-if (windowLight) {
-  let windowOpacity = 0;
+  // === РАСЧЕТ ДЛЯ ДНЕВНОГО СВЕТА ИЗ ОКНА ===
+  if (windowLight) {
+    let windowOpacity = 0;
 
-  if (minutesInDay >= 360 && minutesInDay < 540) {
-    // Утро (06:00 - 09:00): плавный рост от 0.2 до 0.6
-    windowOpacity = 0.2 + ((minutesInDay - 360) / 180) * 0.4;
-  } else if (minutesInDay >= 540 && minutesInDay < 1020) {
-    // День (09:00 - 17:00): максимум (0.6)
-    windowOpacity = 0.6;
-  } else if (minutesInDay >= 1020 && minutesInDay < 1260) {
-    // Вечер (17:00 - 21:00): плавное угасание с 0.6 до 0
-    windowOpacity = 0.6 - ((minutesInDay - 1020) / 240) * 0.6;
-  } else {
-    // Ночь (21:00 - 06:00): полностью выключен (0)
-    windowOpacity = 0;
-  }
+    if (minutesInDay >= 360 && minutesInDay < 540) {
+      windowOpacity = 0.2 + ((minutesInDay - 360) / 180) * 0.4;
+    } else if (minutesInDay >= 540 && minutesInDay < 1020) {
+      windowOpacity = 0.6;
+    } else if (minutesInDay >= 1020 && minutesInDay < 1260) {
+      windowOpacity = 0.6 - ((minutesInDay - 1020) / 240) * 0.6;
+    } else {
+      windowOpacity = 0;
+    }
 
     if (isRaining) {
       windowOpacity *= 0.6;
@@ -164,6 +196,9 @@ if (windowLight) {
   } else {
     moon.classList.remove('active-clicks');
   }
+
+  // Обновляем состояние настенных ламп
+  updateWallLamps();
 }
 
 /**
@@ -189,10 +224,9 @@ function scheduleAmbientSound() {
   setTimeout(scheduleAmbientSound, randomDelay);
 }
 
-// Запуск первой случайной проверки через 1–2 минуты после загрузки
+// === ИНИЦИАЛИЗАЦИЯ ===
 setTimeout(scheduleAmbientSound, (1 + Math.random()) * 60 * 1000);
 
-// МГНОВЕННАЯ ИНИЦИАЛИЗАЦИЯ БЕЗ ПЕРЕХОДНОГО ЭФФЕКТА
 document.body.classList.add('no-transition');
 
 updateDynamicSky();

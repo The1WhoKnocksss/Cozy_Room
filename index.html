@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Our Cozy Room ❤️</title>
+    <title> Наша комнатка ❤️</title>
 
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/animations.css">
@@ -67,6 +67,14 @@
          src="assets/yarns.png"
          alt="">
      </div>
+
+
+     <img id="comb" class="object" src="assets/brush.png" alt="Расчёска" style="display: none;">
+     
+     <div id="spiderContainer" style="display: none;">
+    <span id="spiderSign">?</span>
+    <img id="spider" class="object clickable" src="assets/triggerbot.png" alt="Паучок"></div>
+
 
 
 
@@ -131,7 +139,13 @@
      
 
 
+    <img id="wall_lamps"
+         class="object"
+         src="assets/wall_lamps.png"
+         alt="Настенные лампы"
+         style="display: none;">
 
+    
     <!-- ========================= -->
     <!-- СТОЛ -->
     <!-- ========================= -->
@@ -163,6 +177,18 @@
      src="assets/gamepad.png"
      alt="Геймпад"
      style="display: none;">
+
+    <img id="chocolate"
+     class="object clickable"
+     src="assets/shokolade.png"
+     alt="Шоколадка"
+     style="display: none;">
+
+    <img id="chocolateSpeech"
+     src="assets/shokolade_message.png"
+     alt="Сообщение"
+     style="display: none;">
+
 
     <img id="chairFront"
          class="layer"
@@ -278,6 +304,13 @@
          alt="">
 
 
+    <img id="magicStick"
+     class="object clickable"
+     src="assets/Magic_stick.png"
+     alt="Волшебная палочка"
+     style="display: none;">
+
+
 
     <!-- ========================= -->
     <!-- ОСВЕЩЕНИЕ -->
@@ -368,7 +401,7 @@
 
 <!-- Контейнер для всплывающих записок пиццы -->
 <div id="pizzaCardOverlay">
-    <img id="pizzaCard" src="assets/card1.png" alt="Записка">
+    <img id="pizzaCard" src="assets/pizza_states/card1.png" alt="Записка">
 </div>
 
 
@@ -416,6 +449,10 @@
 <audio id="day-birds" src="audio/day-birds.mp3"></audio>
 <audio id="night-crickets" src="audio/crickets-night.mp3"></audio>
 <audio id="xbox_360_audio" src="audio/xbox_360.mp3"></audio>
+<audio id="Magic_stick_sound" src="audio/magic-stick-sound.mp3"></audio>
+<!-- Звуки бота-паучка -->
+<audio id="Spider_hover_audio" src="audio/bot-hover-beep.wav"></audio>
+<audio id="Spider_click_audio" src="audio/bot-click-beep.wav"></audio>
 
 
 <script src="js/main.js"></script>

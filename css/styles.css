@@ -248,6 +248,75 @@ body{
   transform: translateX(-50%) translateY(-2vw) scale(0.35);
 }
 
+
+/* Позиционирование на месте банки */
+
+
+#comb {
+    position: absolute;
+    top: 11%;   /* Настрой под высоту полки, где стояла банка */
+    left: 17%;  /* Настрой горизонтальное положение */
+    z-index: 2;
+    width: 19%;
+}
+
+/* Контейнер паучка */
+#spiderContainer {
+    position: absolute;
+    top: 2%;   
+    left: 20%;  
+    z-index: 2;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    width: 12%;
+}
+
+#spider {
+    width: 100%;
+    position: relative;
+    z-index: 1; /* Относительный Z-index для паука */
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-origin: bottom center;
+}
+
+/* Приплющивание паучка при наведении */
+#spiderContainer:hover #spider {
+    transform: scaleY(0.9) scaleX(1.15);
+}
+
+/* Розовый мультяшный знак над пауком */
+#spiderSign {
+    position: relative;
+    z-index: 10; /* Слой выше, чем у паука (10 > 1) */
+    font-family: 'Comic Sans MS', 'Chalkboard SE', 'Fredoka', cursive, sans-serif;
+    font-weight: bold;
+    font-size: 3.5vw;
+    color: #ff66b2;
+    text-shadow: 2px 2px 0px #ffffff, -1px -1px 0px #ffffff, 1px -1px 0px #ffffff, -1px 1px 0px #ffffff;
+    user-select: none;
+    margin-bottom: -30%; /* Сдвигаем выше (положительный отступ вместо -15%) */
+    
+    /* Скрытие по умолчанию */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    
+    animation: signFloat 1.5s ease-in-out infinite alternate;
+}
+
+/* Показываем знак ТОЛЬКО при наведении */
+#spiderContainer:hover #spiderSign {
+    opacity: 1;
+}
+
+@keyframes signFloat {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-0.8vw); } /* Анимация покачивания вверх-вниз в vw */
+}
+
+
+
 /* ============================
             ОКНО
 ============================ */
@@ -671,6 +740,52 @@ body{
             СТОЛ
 ============================ */
 
+#wall_lamps {
+    position: absolute;
+    top: 31%;
+    left: 89%;
+    width: 12%;
+    z-index: -1;
+
+    /* 
+       Смещение и размытие заданы в vw (% от ширины экрана) — 
+       свет пропорционально масштабируется при изменении размера окна
+    */
+    filter: drop-shadow(0 0.8vw 1.5vw rgba(255, 245, 180, 0.9))
+            drop-shadow(0 1.5vw 3vw rgba(255, 230, 100, 0.8))
+            drop-shadow(0 3vw 5.5vw rgba(255, 215, 50, 0.6))
+            drop-shadow(0 4.5vw 9vw rgba(255, 200, 20, 0.35));
+    
+    will-change: opacity;
+    animation: smoothYellowGlow 2.5s ease-in-out infinite alternate;
+}
+
+/* Бесподобно оптимизированная плавная анимация */
+@keyframes smoothYellowGlow {
+    0% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Опциональная мягкая подложка света в процентах от размера лампы */
+#wall_lamps::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 250%;          /* 250% от ширины лампы */
+    height: 250%;         /* 250% от высоты лампы */
+    transform: translate(-50%, -20%);
+    background: radial-gradient(circle, rgba(255, 235, 120, 0.4) 0%, rgba(255, 215, 50, 0.15) 50%, transparent 80%);
+    pointer-events: none;
+    z-index: -1;
+    filter: blur(1.5vw);  /* Размытие в процентах от ширины экрана */
+}
+
+
 #desk{
 
     left:1.5%;
@@ -708,7 +823,7 @@ body{
     top: 61%;       /* Настрой положение под стол или полку */
     left: 13%;      
     width: 10%;     /* Настрой размер */
-    z-index: 15;
+    z-index: 2;
     
     /* Плавный переход для всех свойств испарения */
     transition: opacity 0.5s ease, transform 0.5s ease, filter 0.5s ease;
@@ -729,6 +844,8 @@ body{
     top: 59.2%;
     z-index: 3;
     width:13%;
+    pointer-events:none;
+    
 
 }
 
@@ -1605,4 +1722,103 @@ rgba(0,0,0,.18)
     100% {
         transform: translateX(-3%);
     }
+}
+
+
+#magicStick {
+    position: absolute;
+    top: 64%;          /* Настрой положение под стол/полку */
+    left: 63.5%;         /* Настрой положение по горизонтали */
+    width: 6%;         /* Настрой подходящий размер */
+    z-index: 2;
+    transition: transform 0.2s ease, opacity 0.3s ease, filter 0.3s ease;
+}
+
+/* Увеличение при наведении */
+#magicStick:hover {
+    transform: scale(1.35) rotate(5deg);
+    z-index: 11;
+}
+
+/* Эффект испарения при клике */
+#magicStick.vanish {
+    opacity: 0;
+    filter: brightness(2) blur(4px);
+    transform: scale(1.3) rotate(15deg);
+    pointer-events: none;
+}
+
+/* Стили для частиц-искорок */
+.magic-spark {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: radial-gradient(circle, #ffffff 10%, #ffd700 60%, transparent 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 8px #ffe44d, 0 0 12px #ffaa00;
+    pointer-events: none;
+    z-index: 99;
+    animation: sparkFly 0.8s ease-out forwards;
+}
+
+@keyframes sparkFly {
+    0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--dx), var(--dy)) scale(0.2);
+    }
+}
+
+
+/* Позиция шоколадки в кресле */
+#chocolate {
+    position: absolute;
+    top: 65%;          /* Настрой координаты под ручку/лапу мишки */
+    left: 5%;
+    width: 13%;         /* Настрой под желаемый размер */
+    z-index: 2;       /* Над креслом, под лапой или рядом */
+    transform-origin: center center;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Покачивание при наведении */
+#chocolate:hover {
+    animation: chocolateWiggle 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes chocolateWiggle {
+    0% {
+        transform: rotate(-3deg);
+    }
+    100% {
+        transform: rotate(3deg);
+    }
+}
+
+/* Облачко речи мишки */
+#chocolateSpeech {
+    position: absolute;
+    top: 20%;          /* Настрой высоту относительно головы мишки */
+    left: 12%;         /* Настрой положение относительно рта */
+    width: 28%;        /* Размер облачка */
+    z-index: 11;
+    pointer-events: none;
+    
+    /* Точка появления — кончик хвоста облачка (снизу слева) */
+    transform-origin: bottom left;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+}
+
+/* Классы для анимации появления/скрытия облачка */
+#chocolateSpeech.pop-hidden {
+    opacity: 0;
+    transform: scale(0) rotate(-10deg);
+}
+
+#chocolateSpeech.pop-visible {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
 }

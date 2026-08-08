@@ -216,23 +216,84 @@ const jarAudio = document.getElementById('Jar_audio');
 const jarBreakAudio = document.getElementById('Jar_break_audio');
 const bflyAudio = document.getElementById('Bfly_audio');
 
-jarAudio.volume = 0.07;
-jarBreakAudio.volume = 0.1;
-bflyAudio.volume = 0.4;
+const comb = document.getElementById('comb');
+const spiderContainer = document.getElementById('spiderContainer');
+const spider = document.getElementById('spider');
+const spiderSign = document.getElementById('spiderSign');
+
+const spiderHoverAudio = document.getElementById('Spider_hover_audio');
+const spiderClickAudio = document.getElementById('Spider_click_audio');
+
+// Настройка громкости
+if (jarAudio) jarAudio.volume = 0.07;
+if (jarBreakAudio) jarBreakAudio.volume = 0.1;
+if (bflyAudio) bflyAudio.volume = 0.4;
+
+if (spiderHoverAudio) spiderHoverAudio.volume = 0.07; // Тихий "вопросительный" бип
+if (spiderClickAudio) spiderClickAudio.volume = 0.3; // Громкий бип при клике
 
 const maxClicks = Math.floor(Math.random() * (7 - 4 + 1)) + 4;
 let currentClicks = 0;
 let isFalling = false;
+let spiderSignTimer = null;
 
 const butterflyImages = ['assets/BF1.png', 'assets/BF2.png'];
 
 // --- ПРОВЕРКА: Разбирал ли пользователь банку сегодня ---
-const today = new Date().toDateString(); // Например: "Fri Aug 07 2026"
+const today = new Date().toDateString();
 const lastBreakDate = localStorage.getItem('jar_last_break_date');
 
 if (lastBreakDate === today) {
-    // Если банка уже разбита сегодня — скрываем её полностью
-    jar.style.display = 'none';
+    // Банка уже разбита сегодня — скрываем её
+    if (jar) jar.style.display = 'none';
+
+    // 30% шанс на появление пасхалки
+    const EASTER_EGG_CHANCE = 0.30;
+    if (Math.random() < EASTER_EGG_CHANCE) {
+        // Выбираем строго одно: ИЛИ расчёска (comb), ИЛИ паук (spider)
+        const chosenEgg = Math.random() < 0.5 ? 'comb' : 'spider';
+
+        if (chosenEgg === 'comb' && comb) {
+            comb.style.display = 'block';
+        } else if (chosenEgg === 'spider' && spiderContainer) {
+            spiderContainer.style.display = 'flex';
+        }
+    }
+}
+
+// --- ИНТЕРАКТИВ БОТА-ПАУЧКА ---
+if (spiderContainer && spider && spiderSign) {
+    // 1. Воспроизведение звука при наведении
+    spiderContainer.addEventListener('mouseenter', () => {
+        if (spiderHoverAudio) {
+            spiderHoverAudio.currentTime = 0;
+            spiderHoverAudio.play().catch(err => console.log("Ошибка звука hover:", err));
+        }
+    });
+
+    // 2. Клик по паучку: громкий бип, появление ! и сброс на ? через 2 сек
+    spider.addEventListener('click', () => {
+        if (spiderClickAudio) {
+            spiderClickAudio.currentTime = 0;
+            spiderClickAudio.play().catch(err => console.log("Ошибка звука click:", err));
+        }
+
+        spiderSign.textContent = '!';
+
+        spiderSign.animate([
+            { transform: 'scale(1)' },
+            { transform: 'scale(1.4)' },
+            { transform: 'scale(1)' }
+        ], { duration: 200 });
+
+        if (spiderSignTimer) {
+            clearTimeout(spiderSignTimer);
+        }
+
+        spiderSignTimer = setTimeout(() => {
+            spiderSign.textContent = '?';
+        }, 2000);
+    });
 }
 
 /**
@@ -353,76 +414,85 @@ function createButterflyBurst(x, y, count = 55) {
     }
 }
 
-// Обработка кликов по банке
-jar.addEventListener('click', () => {
-    if (isFalling) return;
+// --- ОБРАБОТКА КЛИКОВ ПО БАНКЕ ---
+if (jar) {
+    jar.addEventListener('click', () => {
+        if (isFalling) return;
 
-    currentClicks++;
+        currentClicks++;
 
-    if (currentClicks >= maxClicks) {
-        isFalling = true;
+        if (currentClicks >= maxClicks) {
+            isFalling = true;
 
-        // СОХРАНЯЕМ ДАТУ: заносим сегодняшнее число в память браузера
-        localStorage.setItem('jar_last_break_date', new Date().toDateString());
+            localStorage.setItem('jar_last_break_date', new Date().toDateString());
 
-        jar.style.zIndex = '-1';
-        jar.style.pointerEvents = 'none';
+            jar.style.zIndex = '-1';
+            jar.style.pointerEvents = 'none';
 
-        jar.animate([
-            { transform: 'translateY(0px) rotate(0deg)', opacity: 1 },
-            { transform: 'translateY(5vh) rotate(30deg)', opacity: 1, offset: 0.2 },
-            { transform: 'translateY(110vh) rotate(180deg)', opacity: 0 }
-        ], {
-            duration: 800,
-            easing: 'ease-in',
-            fill: 'forwards'
-        });
-
-        setTimeout(() => {
-            jarBreakAudio.currentTime = 0;
-            jarBreakAudio.play();
-
-            bflyAudio.currentTime = 0;
-            bflyAudio.loop = true;
-            bflyAudio.volume = 0.4;
-            bflyAudio.play();
-
-            const jarRect = jar.getBoundingClientRect();
-            const bottomX = jarRect.left + jarRect.width / 2;
-            const bottomY = window.innerHeight * 0.85;
-
-            createButterflyBurst(bottomX, bottomY, 55);
+            jar.animate([
+                { transform: 'translateY(0px) rotate(0deg)', opacity: 1 },
+                { transform: 'translateY(5vh) rotate(30deg)', opacity: 1, offset: 0.2 },
+                { transform: 'translateY(110vh) rotate(180deg)', opacity: 0 }
+            ], {
+                duration: 800,
+                easing: 'ease-in',
+                fill: 'forwards'
+            });
 
             setTimeout(() => {
-                let fadeInterval = setInterval(() => {
-                    if (bflyAudio.volume > 0.05) {
-                        bflyAudio.volume -= 0.05;
-                    } else {
-                        clearInterval(fadeInterval);
-                        bflyAudio.pause();
-                        bflyAudio.loop = false;
-                    }
-                }, 100);
-            }, 4000);
+                if (jarBreakAudio) {
+                    jarBreakAudio.currentTime = 0;
+                    jarBreakAudio.play();
+                }
 
-        }, 600);
+                if (bflyAudio) {
+                    bflyAudio.currentTime = 0;
+                    bflyAudio.loop = true;
+                    bflyAudio.volume = 0.4;
+                    bflyAudio.play();
+                }
 
-    } else {
-        jarAudio.currentTime = 0;
-        jarAudio.play();
+                const jarRect = jar.getBoundingClientRect();
+                const bottomX = jarRect.left + jarRect.width / 2;
+                const bottomY = window.innerHeight * 0.85;
 
-        jar.animate([
-            { transform: 'rotate(0deg)' },
-            { transform: 'rotate(-8deg)' },
-            { transform: 'rotate(6deg)' },
-            { transform: 'rotate(-4deg)' },
-            { transform: 'rotate(0deg)' }
-        ], {
-            duration: 400,
-            easing: 'ease-in-out'
-        });
-    }
-});
+                createButterflyBurst(bottomX, bottomY, 55);
+
+                setTimeout(() => {
+                    let fadeInterval = setInterval(() => {
+                        if (bflyAudio && bflyAudio.volume > 0.05) {
+                            bflyAudio.volume -= 0.05;
+                        } else {
+                            clearInterval(fadeInterval);
+                            if (bflyAudio) {
+                                bflyAudio.pause();
+                                bflyAudio.loop = false;
+                            }
+                        }
+                    }, 100);
+                }, 4000);
+
+            }, 600);
+
+        } else {
+            if (jarAudio) {
+                jarAudio.currentTime = 0;
+                jarAudio.play();
+            }
+
+            jar.animate([
+                { transform: 'rotate(0deg)' },
+                { transform: 'rotate(-8deg)' },
+                { transform: 'rotate(6deg)' },
+                { transform: 'rotate(-4deg)' },
+                { transform: 'rotate(0deg)' }
+            ], {
+                duration: 400,
+                easing: 'ease-in-out'
+            });
+        }
+    });
+}
 
 // === ЛОГИКА ОКНА ЛУНЫ И СКАЗОК ===
 document.addEventListener('DOMContentLoaded', () => {
@@ -660,5 +730,138 @@ if (dino && dinoScroll) {
   // Обработчик клика по свитку
   dinoScroll.addEventListener('click', () => {
     console.log("Клик по свитку динозавра");
+  });
+}
+
+
+
+const magicStick = document.getElementById('magicStick');
+const magicStickAudio = document.getElementById('Magic_stick_sound');
+const MAGIC_STICK_CHANCE = 0.15;
+
+const isStickFirstVisit = !localStorage.getItem('cozy_room_visited');
+
+if (magicStick) {
+  if (isStickFirstVisit) {
+    magicStick.style.display = 'none';
+  } else {
+    const isStickSpawned = Math.random() < MAGIC_STICK_CHANCE;
+    magicStick.style.display = isStickSpawned ? 'block' : 'none';
+  }
+
+  magicStick.addEventListener('click', () => {
+    // 1. Воспроизводим звук с громкостью 10% (0.10)
+    if (magicStickAudio) {
+      magicStickAudio.volume = 0.10;
+      magicStickAudio.currentTime = 0;
+      magicStickAudio.play().catch(err => console.log("Ошибка воспроизведения звука палочки:", err));
+    }
+
+    // 2. Вычисляем координаты (кончик палочки, смещен левее)
+    const rect = magicStick.getBoundingClientRect();
+    const tipX = rect.left + (rect.width * 0.25);
+    const tipY = rect.top;
+
+    // 3. Запускаем искры и анимацию исчезновения
+    createSparkBurst(tipX, tipY);
+    magicStick.classList.add('vanish');
+
+    setTimeout(() => {
+      magicStick.remove();
+    }, 300);
+  });
+}
+
+function createSparkBurst(originX, originY) {
+  const sparkCount = 120; // Увеличено количество искр (было 30)
+
+  for (let i = 0; i < sparkCount; i++) {
+    const spark = document.createElement('div');
+    spark.className = 'magic-spark';
+
+    const angle = Math.random() * Math.PI * 2;
+    // Увеличена дальность разлета: от 100px до 280px (было 40-120px)
+    const distance = 200 + Math.random() * 180; 
+
+    const dx = `${Math.cos(angle) * distance}px`;
+    const dy = `${Math.sin(angle) * distance}px`;
+
+    spark.style.setProperty('--dx', dx);
+    spark.style.setProperty('--dy', dy);
+
+    spark.style.left = `${originX}px`;
+    spark.style.top = `${originY}px`;
+
+    // Разные размеры искорок для пышности эффекта
+    const size = 3 + Math.random() * 7;
+    spark.style.width = `${size}px`;
+    spark.style.height = `${size}px`;
+
+    document.body.appendChild(spark);
+
+    setTimeout(() => {
+      spark.remove();
+    }, 800);
+  }
+}
+
+
+
+const chocolate = document.getElementById('chocolate');
+const chocolateSpeech = document.getElementById('chocolateSpeech');
+const chocoEatAudio = document.getElementById('Pizza_audio');
+
+const CHOCOLATE_CHANCE = 0.2; // 20% шанс появления (поставь 1.0 для теста)
+const isChocolateFirstVisit = !localStorage.getItem('cozy_room_visited');
+
+if (chocolate && chocolateSpeech) {
+  // Настройка первого посещения и спавна
+  if (isChocolateFirstVisit) {
+    chocolate.style.display = 'none';
+  } else {
+    const isChocolateSpawned = Math.random() < CHOCOLATE_CHANCE;
+    chocolate.style.display = isChocolateSpawned ? 'block' : 'none';
+  }
+
+  // Начальное состояние облачка
+  chocolateSpeech.style.display = 'none';
+  chocolateSpeech.classList.add('pop-hidden');
+
+  chocolate.addEventListener('click', () => {
+    // 1. Воспроизводим звук съедания (громкость 0.25, как у пиццы/помидора)
+    if (chocoEatAudio) {
+      chocoEatAudio.volume = 0.25;
+      chocoEatAudio.currentTime = 0;
+      chocoEatAudio.play().catch(err => console.log("Ошибка воспроизведения звука:", err));
+    }
+
+    // 2. Шоколадка мгновенно исчезает
+    chocolate.style.display = 'none';
+
+    // 3. Через 1 секунду появляется облачко из рта мишки
+    setTimeout(() => {
+      chocolateSpeech.style.display = 'block';
+      chocolateSpeech.classList.add('pop-hidden');
+      chocolateSpeech.classList.remove('pop-visible');
+
+      // Форсируем применение начальных стилей для срабатывания анимации
+      void chocolateSpeech.offsetWidth;
+
+      // Плавно разворачиваем облачко
+      chocolateSpeech.classList.remove('pop-hidden');
+      chocolateSpeech.classList.add('pop-visible');
+
+      // 4. Через 4 секунды запускаем анимацию скрытия
+      setTimeout(() => {
+        chocolateSpeech.classList.remove('pop-visible');
+        chocolateSpeech.classList.add('pop-hidden');
+
+        // Скрываем элемент из DOM после завершения переходы (400мс)
+        setTimeout(() => {
+          chocolateSpeech.style.display = 'none';
+        }, 400);
+      }, 4000);
+
+    }, 1000);
   });
 }
