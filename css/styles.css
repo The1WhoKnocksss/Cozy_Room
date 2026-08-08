@@ -779,9 +779,9 @@ body{
     width: 250%;          /* 250% от ширины лампы */
     height: 250%;         /* 250% от высоты лампы */
     transform: translate(-50%, -20%);
-    background: radial-gradient(circle, rgba(255, 235, 120, 0.4) 0%, rgba(255, 215, 50, 0.15) 50%, transparent 80%);
+    background: radial-gradient(circle, rgba(255, 235, 120, 0.6) 0%, rgba(255, 215, 50, 0.25) 50%, transparent 80%);
     pointer-events: none;
-    z-index: -1;
+    z-index: 11;
     filter: blur(1.5vw);  /* Размытие в процентах от ширины экрана */
 }
 
