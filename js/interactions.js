@@ -1,59 +1,112 @@
 const pizza = document.getElementById('pizza');
+const tomato = document.getElementById('tomato');
 const pizzaCardOverlay = document.getElementById('pizzaCardOverlay');
 const pizzaCard = document.getElementById('pizzaCard');
-const pizzaAudio = document.getElementById('Pizza_audio'); // Подключаем элемент звука пиццы
+const pizzaAudio = document.getElementById('Pizza_audio');
 
-const PIZZA_SOUND_VOLUME = 0.03; // Настройка тихой громкости (5%)
+const PIZZA_SOUND_VOLUME = 0.03;
+const TOMATO_CHANCE = 0.20;
 
-// 5 состояний куска пиццы
-const pizzaStates = [
-  'assets/pizza_states/pizza_state1.png', // Целый кусок (индекс 0)
-  'assets/pizza_states/pizza_state2.png', // 1 укус (индекс 1)
-  'assets/pizza_states/pizza_state3.png', // 2 укус (индекс 2)
-  'assets/pizza_states/pizza_state4.png', // Предпоследний укус (индекс 3)
-  'assets/pizza_states/pizza_state5.png'  // Последний укус / корочка (индекс 4)
-];
+// Проверка первого визита в браузере
+const hasVisitedBefore = localStorage.getItem('cozy_room_visited');
+let isTomatoSpawned = false;
 
-// 4 записки
-const pizzaCards = [
-  'assets/pizza_states/card1.png',
-  'assets/pizza_states/card2.png',
-  'assets/pizza_states/card3.png',
-  'assets/pizza_states/card4.png'
-];
+if (!hasVisitedBefore) {
+  // На первый визит фиксируем заход и всегда ставим пиццу
+  localStorage.setItem('cozy_room_visited', 'true');
+  isTomatoSpawned = false;
+} else {
+  // На повторные визиты — обычный 20% шанс
+  isTomatoSpawned = Math.random() < TOMATO_CHANCE;
+}
 
-let currentStateIndex = 0;
 let cardHideTimeout;
 
-if (pizza) {
-  pizza.src = pizzaStates[currentStateIndex];
+// Функция воспроизведения звука
+function playBiteSound() {
+  if (pizzaAudio) {
+    pizzaAudio.volume = PIZZA_SOUND_VOLUME;
+    pizzaAudio.currentTime = 0;
+    pizzaAudio.play().catch(err => console.log("Ошибка воспроизведения звука:", err));
+  }
+}
 
-  pizza.addEventListener('click', () => {
-    // Включаем звук укуса при каждом клике
-    if (pizzaAudio) {
-      pizzaAudio.volume = PIZZA_SOUND_VOLUME; // Устанавливаем громкость
-      pizzaAudio.currentTime = 0;             // Перемотка на начало для быстрого повторного клика
-      pizzaAudio.play().catch(err => console.log("Ошибка воспроизведения звука пиццы:", err));
+// Функция показа записки (для пиццы)
+function showCard(cardSrc, delay) {
+  if (!cardSrc) return;
+  
+  clearTimeout(cardHideTimeout);
+  pizzaCardOverlay.classList.remove('show');
+
+  setTimeout(() => {
+    pizzaCard.src = cardSrc;
+    pizzaCardOverlay.classList.add('show');
+    
+    cardHideTimeout = setTimeout(() => {
+      pizzaCardOverlay.classList.remove('show');
+    }, 2000);
+  }, delay);
+}
+
+// === ЛОГИКА ВЫБОРА: ПИЦЦА ИЛИ ПОМИДОР ===
+if (isTomatoSpawned && tomato) {
+  // Убираем пиццу, показываем помидор
+  if (pizza) pizza.remove();
+  tomato.style.display = 'block';
+
+  const tomatoStates = [
+    'assets/tomato_states/tomato_state-1.png',
+    'assets/tomato_states/tomato_state-2.png',
+    'assets/tomato_states/tomato_state-3.png',
+    'assets/tomato_states/tomato_state-4.png'
+  ];
+
+  let currentTomatoIndex = 0;
+  tomato.src = tomatoStates[currentTomatoIndex];
+
+  tomato.addEventListener('click', () => {
+    playBiteSound();
+
+    currentTomatoIndex++;
+
+    if (currentTomatoIndex >= tomatoStates.length) {
+      // 4-й клик: помидор полностью съеден
+      tomato.remove();
+    } else {
+      tomato.src = tomatoStates[currentTomatoIndex];
     }
 
-    currentStateIndex++;
-    clearTimeout(cardHideTimeout);
+    // Записки отключены, пока не нарисуешь отдельные для томатов!
+  });
 
-    // Сразу прячем текущую открытую записку, если она была на экране
-    pizzaCardOverlay.classList.remove('show');
+} else if (pizza) {
+  // Иначе показываем пиццу, помидор удаляем
+  if (tomato) tomato.remove();
 
-    // МГНОВЕННО проверяем: если это 5-й клик — сразу полностью удаляем кусок пиццы из игры
-    if (currentStateIndex >= pizzaStates.length) {
+  const pizzaStates = [
+    'assets/pizza_states/pizza_state1.png',
+    'assets/pizza_states/pizza_state2.png',
+    'assets/pizza_states/pizza_state3.png',
+    'assets/pizza_states/pizza_state4.png',
+    'assets/pizza_states/pizza_state5.png'
+  ];
+
+  let currentPizzaIndex = 0;
+  pizza.src = pizzaStates[currentPizzaIndex];
+
+  pizza.addEventListener('click', () => {
+    playBiteSound();
+
+    currentPizzaIndex++;
+
+    if (currentPizzaIndex >= pizzaStates.length) {
       pizza.remove();
     } else {
-      // Если куски еще есть — просто меняем спрайт на следующий
-      pizza.src = pizzaStates[currentStateIndex];
+      pizza.src = pizzaStates[currentPizzaIndex];
     }
 
     let nextCardSrc = null;
-
-    // Назначаем карточки строго по укусам
-    switch (currentStateIndex) {
+    switch (currentPizzaIndex) {
       case 1:
         nextCardSrc = 'assets/pizza_states/card1.png';
         break;
@@ -61,34 +114,23 @@ if (pizza) {
         nextCardSrc = 'assets/pizza_states/card2.png';
         break;
       case 3:
-        nextCardSrc = null; // Третий укус — пропускаем, ничего не выводим
+        nextCardSrc = null;
         break;
       case 4:
         nextCardSrc = 'assets/pizza_states/card3.png';
         break;
       case 5:
-        nextCardSrc = 'assets/pizza_states/card4.png'; // Последняя записка после исчезновения пиццы
+        nextCardSrc = 'assets/pizza_states/card4.png';
         break;
     }
 
-    // Если для этого шага есть карточка — запускаем её появление
-    if (nextCardSrc) {
-      // Задержка: для 5-го клика делаем паузу в 1000мс (1 секунда), для остальных — быстрые 50мс
-      const appearanceDelay = (currentStateIndex === 5) ? 1000 : 50;
-
-      setTimeout(() => {
-        pizzaCard.src = nextCardSrc;
-        pizzaCardOverlay.classList.add('show');
-        
-        // Таймер автоматического скрытия карточки через 2 секунды обратно вниз
-        cardHideTimeout = setTimeout(() => {
-          pizzaCardOverlay.classList.remove('show');
-        }, 2000);
-        
-      }, appearanceDelay);
-    }
+    const appearanceDelay = (currentPizzaIndex === 5) ? 1000 : 50;
+    showCard(nextCardSrc, appearanceDelay);
   });
 }
+
+
+
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -174,8 +216,8 @@ const jarAudio = document.getElementById('Jar_audio');
 const jarBreakAudio = document.getElementById('Jar_break_audio');
 const bflyAudio = document.getElementById('Bfly_audio');
 
-jarAudio.volume = 0.3;
-jarBreakAudio.volume = 0.5;
+jarAudio.volume = 0.07;
+jarBreakAudio.volume = 0.1;
 bflyAudio.volume = 0.4;
 
 const maxClicks = Math.floor(Math.random() * (7 - 4 + 1)) + 4;
@@ -526,3 +568,97 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+
+
+const dreamcatcher = document.getElementById('dreamcatcher');
+const DREAMCATCHER_CHANCE = 0.15; // Поставь 1.0 для теста
+
+// Используем уникальное имя переменной, чтобы не было конфликта
+const isFirstVisit = !localStorage.getItem('cozy_room_visited');
+
+if (dreamcatcher) {
+  if (isFirstVisit) {
+    // При первом визите ловец НЕ появляется, но фиксируем посещение
+    localStorage.setItem('cozy_room_visited', 'true');
+    dreamcatcher.style.display = 'none';
+  } else {
+    // При последующих визитах проверяем шанс
+    const isDreamcatcherSpawned = Math.random() < DREAMCATCHER_CHANCE;
+
+    if (isDreamcatcherSpawned) {
+      dreamcatcher.style.display = 'block';
+    } else {
+      dreamcatcher.style.display = 'none';
+    }
+  }
+}
+
+
+const gamepad = document.getElementById('gamepad');
+const xboxAudio = document.getElementById('xbox_360_audio');
+const GAMEPAD_CHANCE = 0.20; // 10% шанс появления
+
+const isGamepadFirstVisit = !localStorage.getItem('cozy_room_visited');
+
+if (gamepad) {
+  if (isGamepadFirstVisit) {
+    // На первый запуск 100% скрыт
+    gamepad.style.display = 'none';
+  } else {
+    // На повторные заходы проверяем 10% шанс
+    const isGamepadSpawned = Math.random() < GAMEPAD_CHANCE;
+
+    if (isGamepadSpawned) {
+      gamepad.style.display = 'block';
+    } else {
+      gamepad.style.display = 'none';
+    }
+  }
+
+  // Обработчик клика (сработает, если геймпад появился)
+  gamepad.addEventListener('click', () => {
+    if (xboxAudio) {
+      xboxAudio.volume = 0.25;
+      xboxAudio.currentTime = 0;
+      xboxAudio.play().catch(err => console.log("Ошибка звука геймпада:", err));
+    }
+
+    gamepad.classList.add('evaporate');
+
+    setTimeout(() => {
+      gamepad.remove();
+    }, 500);
+  });
+}
+
+
+const dino = document.getElementById('dino');
+const dinoScroll = document.getElementById('dino-scroll');
+const SCROLL_CHANCE = 0.15; // 15% шанс
+
+const isDinoFirstVisit = !localStorage.getItem('cozy_room_visited');
+
+if (dino && dinoScroll) {
+  if (isDinoFirstVisit) {
+    // При первом визите — всегда динозавр
+    dino.style.display = 'block';
+    dinoScroll.style.display = 'none';
+  } else {
+    // При повторных визитах проверяем шанс
+    const isScrollSpawned = Math.random() < SCROLL_CHANCE;
+
+    if (isScrollSpawned) {
+      dino.style.display = 'none';
+      dinoScroll.style.display = 'block';
+    } else {
+      dino.style.display = 'block';
+      dinoScroll.style.display = 'none';
+    }
+  }
+
+  // Обработчик клика по свитку
+  dinoScroll.addEventListener('click', () => {
+    console.log("Клик по свитку динозавра");
+  });
+}

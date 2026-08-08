@@ -24,7 +24,6 @@ body{
     font-family:sans-serif;
 }
 
-
 /* ============================
             КОМНАТА
 ============================ */
@@ -39,7 +38,6 @@ body{
     overflow:hidden;
 
 }
-
 
 /* ============================
       ОБЩИЕ НАСТРОЙКИ
@@ -61,8 +59,6 @@ body{
 
 }
 
-
-
 /* ============================
             ФОН
 ============================ */
@@ -78,7 +74,6 @@ body{
     object-fit:cover;
 
 }
-
 
 
 /* ============================
@@ -181,9 +176,6 @@ body{
 }
 
 
-
-
-
 /* Контейнер для игрушек и звёзд */
 .yarns-container {
   /* ИЗМЕНЕНИЕ: меняем relative на absolute, чтобы координаты */
@@ -198,8 +190,6 @@ body{
   top: 0.4vw;              /* ПОДБЕРИТЕ ЭТО ЗНАЧЕНИЕ (например: 10vw, 12vw, 18vw) */
   left: 2%;               /* Оставляем отступ слева */
 }
-
-
 
 /* Сама картинка с игрушками */
 #yarns {
@@ -257,8 +247,6 @@ body{
 .yarns-container:hover .star-sprite.second {
   transform: translateX(-50%) translateY(-2vw) scale(0.35);
 }
-
-
 
 /* ============================
             ОКНО
@@ -388,9 +376,6 @@ body{
   opacity: 1;
   transition: opacity 2s ease-in-out;
 }
-
-
-
 
 /* Контейнер встает на место вашего старого элемента #flower */
 .flower-container {
@@ -529,8 +514,6 @@ body{
 }
 
 
-
-
 #dino{
 
     left:85%;
@@ -538,6 +521,51 @@ body{
 
     width:12%;
 
+}
+
+#dino-scroll {
+    left: 84%;
+    top: 29%;
+    width: 12%;
+    transform-origin: center center;
+    transition: transform 0.2s ease;
+}
+
+/* При наведении курсора запускается легкое покачивание */
+#dino-scroll:hover {
+    animation: scrollWiggle 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes scrollWiggle {
+    0% {
+        transform: rotate(-2deg);
+    }
+    100% {
+        transform: rotate(2deg);
+    }
+}
+
+
+#dreamcatcher {
+    position: absolute;
+    top: -3%;      /* Настрой высоту под свою стену/окно */
+    left: 49%;     /* Настрой положение по горизонтали */
+    width: 12%;     /* Подбери нужный размер */
+    z-index: 2;
+    pointer-events: none;
+
+    /* Настройка покачивания */
+    transform-origin: top center; 
+    animation: dreamcatcherSway 5s ease-in-out infinite alternate;
+}
+
+@keyframes dreamcatcherSway {
+    0% {
+        transform: rotate(-3deg);
+    }
+    100% {
+        transform: rotate(3deg);
+    }
 }
 
 
@@ -639,14 +667,6 @@ body{
 
 
 
-
-
-
-
-
-
-
-
 /* ============================
             СТОЛ
 ============================ */
@@ -659,7 +679,6 @@ body{
     width:97%;
 
 }
-
 
 
 /* ============================
@@ -683,6 +702,26 @@ body{
     width:23%;
 
 }
+
+#gamepad {
+    position: absolute;
+    top: 61%;       /* Настрой положение под стол или полку */
+    left: 13%;      
+    width: 10%;     /* Настрой размер */
+    z-index: 15;
+    
+    /* Плавный переход для всех свойств испарения */
+    transition: opacity 0.5s ease, transform 0.5s ease, filter 0.5s ease;
+}
+
+/* Класс «испарения» */
+#gamepad.evaporate {
+    opacity: 0;
+    transform: translateY(-15px) scale(1.05); /* Легкий подъем и увеличение */
+    filter: blur(4px);                         /* Эффект испарения/размытия */
+    pointer-events: none;                      /* Отключаем повторные клики */
+}
+
 
 #chairFront{
 
@@ -911,9 +950,6 @@ body{
 }
 
 
-
-
-
 /* ============================
             ПИЦЦА
 ============================ */
@@ -936,6 +972,14 @@ body{
 
 }
 
+#tomato{
+
+    left:43%;
+    top:62%;
+
+    width:18%;
+
+}
 
 /* Контейнер для карточки (без фона, без блюра) */
 /* Контейнер для карточки */
@@ -966,10 +1010,6 @@ body{
 }
 
 
-
-
-
-
 /* ============================
             ПАЗЛЫ
 ============================ */
@@ -997,8 +1037,6 @@ body{
     top: 40%;
 }
 
-
-
 /* ============================
             УТОЧКА
 ============================ */
@@ -1013,7 +1051,6 @@ body{
 }
 
 
-
 /* ============================
             MP3
 ============================ */
@@ -1026,7 +1063,6 @@ body{
     width:15%;
 
 }
-
 
 
 /* ============================
@@ -1108,12 +1144,6 @@ body{
         opacity: 1;
     }
 }
-
-
-
-
-
-
 
 /* ============================
       БУДУЩИЕ ЭФФЕКТЫ
@@ -1236,8 +1266,6 @@ rgba(0,0,0,.18)
   }
 }
 
-
-
 #noteOverlay{
 
     position:fixed;
@@ -1339,9 +1367,6 @@ rgba(0,0,0,.18)
     animation:noteAppear .45s ease;
 
 }
-
-
-
 
 /* Весь контейнер-оверлей, изначально скрыт */
 /* Весь контейнер-оверлей */
@@ -1474,7 +1499,6 @@ rgba(0,0,0,.18)
     transition: none !important;
 }
 
-
 /* ================================================= */
 /* INTRO SCREEN */
 /* ================================================= */
@@ -1510,7 +1534,6 @@ rgba(0,0,0,.18)
     cursor: pointer;
 
 }
-
 
 /* Картинка вступления */
 
