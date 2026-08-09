@@ -282,68 +282,86 @@ if (flowerOverlay) {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Настройки путей к вашим картинкам с экрана
-    const IMAGE_FOLDER = "assets/album_pages/"; // Папка, где лежат картинки
-    const IMAGE_EXTENSION = ".png"; // Все файлы строго .png
-    const TOTAL_PAGES = 11;         // Всего 11 штук
-    const ALBUM_SOUND_VOLUME = 0.05; // Настройка тихой громкости (5%)
+    // Настройки
+    const IMAGE_FOLDER = "assets/album_pages/";
+    const IMAGE_EXTENSION = ".png";
+    const TOTAL_PAGES = 11;
+    const ALBUM_SOUND_VOLUME = 0.05;
+    const DEUTSCH_CHANCE = 0.05; // 5% шанс при каждой загрузке страницы
 
-    // Находим элементы на странице
+    // Находим элементы
     const albumOverlay = document.getElementById('album-page-overlay');
     const albumImg = document.getElementById('album-page-img');
-    const albumBtn = document.getElementById('album');         // Ваша картинка-альбом
-    const albumAudio = document.getElementById('Album_audio'); // Элемент звука альбома
+    const albumBtn = document.getElementById('album'); 
+    const deutschBtn = document.getElementById('deutsch-book');
+    const albumAudio = document.getElementById('Album_audio');
 
-    // Функция, которая выбирает случайную картинку И держит её весь день
+    // === 1. ПОЯВЛЕНИЕ ТЕТРАДИ ПРИ КАЖДОМ ЗАХОДЕ/ОБНОВЛЕНИИ ===
+    const isDeutschSpawned = Math.random() < DEUTSCH_CHANCE;
+
+    if (isDeutschSpawned && deutschBtn) {
+        if (albumBtn) albumBtn.style.display = 'none';
+        deutschBtn.style.display = 'block';
+    } else {
+        if (deutschBtn) deutschBtn.style.display = 'none';
+        if (albumBtn) albumBtn.style.display = 'block';
+    }
+
+    // === 2. ЕЖЕДНЕВНАЯ СТРАНИЦА ДЛЯ АЛЬБОМА (1 СТРАНИЦА В ДЕНЬ) ===
     function getDailyPageNumber() {
-        const todayString = new Date().toDateString(); // Берем текущую дату (день, месяц, год)
-        
-        let savedDate = localStorage.getItem('album_img_date');   // Проверяем сохраненную дату
-        let savedNumber = localStorage.getItem('album_img_number'); // Проверяем сохраненный номер картинки
+        const todayString = new Date().toDateString();
+        let savedDate = localStorage.getItem('album_img_date');
+        let savedNumber = localStorage.getItem('album_img_number');
 
-        // Если наступил новый день ИЛИ пользователь зашел вообще впервые
         if (savedDate !== todayString || savedNumber === null) {
-            // Генерируем случайное целое число от 1 до 11
             savedNumber = Math.floor(Math.random() * TOTAL_PAGES) + 1;
-            
-            // Записываем новые данные в память браузера, чтобы зафиксировать их на сегодня
             localStorage.setItem('album_img_date', todayString);
             localStorage.setItem('album_img_number', savedNumber);
         }
 
-        // Возвращаем номер (старый сегодняшний или только что созданный)
         return savedNumber;
     }
 
-    // Клик по альбому — открываем оверлей с нужной картинкой
+    // === 3. ФУНКЦИЯ ОТКРЫТИЯ С ОВЕРЛЕЕМ И ЗВУКОМ ===
+    function openOverlay(imageSrc) {
+        if (!albumOverlay || !albumImg) return;
+
+        albumImg.src = imageSrc;
+        albumOverlay.classList.add('album-page-visible');
+
+        if (albumAudio) {
+            albumAudio.volume = ALBUM_SOUND_VOLUME;
+            albumAudio.currentTime = 0;
+            albumAudio.play().catch(err => console.log("Ошибка воспроизведения звука:", err));
+        }
+    }
+
+    // === 4. КЛИКИ ПО ПРЕДМЕТАМ ===
+
+    // Клик по альбому (страница фиксирована на день)
     if (albumBtn) {
         albumBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Защита от случайного срабатывания других кликов
-            
-            const pageNum = getDailyPageNumber(); // Получаем номер страницы на сегодня
-            
-            // Собираем правильный путь с дефисом: "assets/album_pages/page-5.png"
-            albumImg.src = `${IMAGE_FOLDER}page-${pageNum}${IMAGE_EXTENSION}`;
-            
-            // Показываем оверлей (активируем CSS-эффект блюра и затемнения)
-            albumOverlay.classList.add('album-page-visible');
-
-            // Включаем звук альбома
-            if (albumAudio) {
-                albumAudio.volume = ALBUM_SOUND_VOLUME; // Задаем тихую громкость
-                albumAudio.currentTime = 0;             // Сброс на начало
-                albumAudio.play().catch(err => console.log("Ошибка воспроизведения звука альбома:", err));
-            }
+            e.stopPropagation();
+            const pageNum = getDailyPageNumber();
+            openOverlay(`${IMAGE_FOLDER}page-${pageNum}${IMAGE_EXTENSION}`);
         });
     }
 
-    // Повторный клик в любое место экрана закрывает картинку
-    albumOverlay.addEventListener('click', () => {
-        albumOverlay.classList.remove('album-page-visible');
+    // Клик по тетради (всегда одна разворот-страница)
+    if (deutschBtn) {
+        deutschBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openOverlay('assets/deutsch.png');
+        });
+    }
 
-        // Останавливаем звук при закрытии
-        if (albumAudio) {
-            albumAudio.pause();
-        }
-    });
+    // Закрытие при клике в любое место
+    if (albumOverlay) {
+        albumOverlay.addEventListener('click', () => {
+            albumOverlay.classList.remove('album-page-visible');
+            if (albumAudio) {
+                albumAudio.pause();
+            }
+        });
+    }
 });

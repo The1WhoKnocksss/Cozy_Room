@@ -11,11 +11,29 @@ const wallLamps = document.getElementById('wall_lamps');
 if (dayBirdsAudio) dayBirdsAudio.volume = 0.1;
 if (nightCricketsAudio) nightCricketsAudio.volume = 0.1;
 
+// === ЛОГИКА СЧЕТЧИКА ВИЗИТОВ И РОЗОВОЙ АНОМАЛИИ ===
+function checkPinkAnomalyEligibility() {
+  let visits = parseInt(localStorage.getItem('cozy_room_visit_count') || '0', 10);
+  visits += 1;
+  localStorage.setItem('cozy_room_visit_count', visits.toString());
+
+  // Первые 5 загрузок аномалия гарантированно не появляется
+  if (visits <= 5) {
+    return false;
+  }
+
+  // Начиная с 6-й загрузки — 3% шанс
+  const PINK_CHANCE = 0.03;
+  return Math.random() < PINK_CHANCE;
+}
+
+const isPinkAnomaly = checkPinkAnomalyEligibility();
+
 // === СОСТОЯНИЕ ПАСХАЛКИ ДЛЯ ЛАМП ===
 let isLampsSpawnedThisSession = null;
 
 /**
- * Проверка права на появление ламп (25% шанс, не при первом визите)
+ * Проверка права на появление ламп (20% шанс, не при первом визите)
  */
 function checkLampsSpawnEligibility() {
   const isFirstVisit = !localStorage.getItem('cozy_room_visited');
@@ -82,17 +100,17 @@ function toggleRainEffect(enable) {
 }
 
 async function checkWeather() {
+  if (isPinkAnomaly) {
+    toggleRainEffect(false);
+    updateDynamicSky();
+    return;
+  }
+
   try {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${MOSCOW_LAT}&longitude=${MOSCOW_LON}&current=rain,showers`;
     const response = await fetch(url);
     const data = await response.json();
     isRaining = data.current.rain > 0 || data.current.showers > 0;
-
-    if (isRaining) {
-      console.log("В Москве сейчас идет дождь 🌧️");
-    } else {
-      console.log("В Москве сейчас нет дождя ☀️");
-    }
 
     toggleRainEffect(isRaining);
     updateDynamicSky(); 
@@ -111,6 +129,32 @@ function updateDynamicSky() {
 
   if (!sky || !moon || !lighting) return;
 
+  // === ОБРАБОТКА РОЗОВОЙ АНОМАЛИИ ===
+if (isPinkAnomaly) {
+    // Фон за окном
+    sky.style.background = "url('assets/dreams.png') center/cover no-repeat";
+
+    // Прячем луну и её свет
+    moon.style.opacity = 0;
+    moon.classList.remove('active-clicks');
+    if (moonLight) moonLight.style.opacity = 0;
+
+    // Мягкий нежно-розовый фильтр на комнату
+    lighting.style.background = hexToRgba('#ff66b2', 0.15); // Было 0.35 -> снизили до 0.15
+    lighting.style.filter = 'brightness(105%)';             // Было 130% -> убрали резкую засветку
+
+    // Мягкий свет из окна
+    if (windowLight) {
+      windowLight.style.opacity = 0.35;                      // Было 0.85 -> снизили прозрачность
+      windowLight.style.background = hexToRgba('#ff99dd', 0.2); // Пастельно-розовый оттенок
+    }
+
+    toggleRainEffect(false);
+    updateWallLamps();
+    return;
+  }
+
+  // === ОБЫЧНЫЙ РАСЧЕТ ВРЕМЕНИ СУТОК ===
   const now = new Date();
   const minutesInDay = now.getHours() * 60 + now.getMinutes();
   const currentHour = now.getHours();
@@ -189,6 +233,7 @@ function updateDynamicSky() {
     }
 
     windowLight.style.opacity = windowOpacity;
+    windowLight.style.background = ''; // Сброс кастомного фона при обычной погоде
   }
 
   if (currentHour >= 21 || currentHour < 6) {
@@ -197,7 +242,6 @@ function updateDynamicSky() {
     moon.classList.remove('active-clicks');
   }
 
-  // Обновляем состояние настенных ламп
   updateWallLamps();
 }
 

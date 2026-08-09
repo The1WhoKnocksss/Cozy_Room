@@ -344,9 +344,9 @@ body{
 
 #sky {
   position: absolute;
-  left: 64%;
+  left: 62%;
   top: 0%;
-  width: 28%;
+  width: 30%;
   height: 32%;
   overflow: hidden;
   border-radius: 2%;
@@ -459,6 +459,8 @@ body{
 #pot {
     width: 100%;
     display: block;
+    position: relative; /* Обязательно для работы z-index */
+    z-index: 1;          /* Задает слой относительно растения */
 }
 
 /* Растение позиционируется абсолютно внутри контейнера поверх горшка */
@@ -554,6 +556,18 @@ body{
     66% {
         transform: translateZ(0) rotate(1.8deg);
     }
+}
+
+
+/* Кактус в горшке */
+#plant.cactus-plant {
+    animation: none !important;          /* Запрещает анимации роста и покачивания */
+    cursor: default !important;         /* Стандартный курсор */
+    pointer-events: none !important;    /* Полный игнор кликов */
+    top: -80% !important;              /* Посадка в земляной ком */
+    left: 52% !important;
+    transform: translateX(-50%) !important;
+    width: 90% !important;
 }
 
 
@@ -1228,6 +1242,30 @@ body{
     top: 49%;
     width: 23%;
 }
+
+#deutsch-book {
+    position: absolute;
+    left: 74%;
+    top: 49%;
+    width: 23%;
+    z-index: 2;
+    cursor: pointer;
+    /* Точка трансформации в правом нижнем углу для естественного наклона */
+    transform-origin: bottom right;
+    
+    /* Плавность анимации подъема и возврата */
+    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), filter 0.25s ease;
+    will-change: transform;
+}
+
+#deutsch-book:hover {
+    /* Приподнимаем вверх (-8px), поворачиваем (-6deg) и слегка увеличиваем */
+    transform: translateY(-8px) rotate(-6deg) scale(1.03);
+    
+    /* Тень слегка смещается и становится мягче при подъеме */
+    filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.25));
+}
+
 
 /* Оверлей: затемнение всего экрана и размытие заднего плана */
 #album-page-overlay {
@@ -2044,5 +2082,47 @@ rgba(0,0,0,.18)
     max-height: 80vh;
     object-fit: contain;
     filter: drop-shadow(0 10px 25px rgba(0,0,0,0.5));
+    cursor: pointer;
+}
+
+
+/* Розоватый блюр-фон */
+#love-letter-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(35, 10, 25, 0.75); /* Тёмно-розовый оттенок */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+#love-letter-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#love-letter-overlay .modal-content {
+    transform: scale(0.8);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+}
+
+#love-letter-overlay.active .modal-content {
+    transform: scale(1);
+}
+
+#love-letter-img {
+    max-width: 70vw;
+    max-height: 70vh;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 25px rgba(255, 105, 180, 0.2));
     cursor: pointer;
 }

@@ -1066,60 +1066,80 @@ if (ears) {
 })();
 
 
-(function initGiantPlantEasterEgg() {
+(function initPlantAnomalies() {
     const plant = document.getElementById('plant');
-    const wtfNote = document.getElementById('wtf-note');
     const flowerContainer = plant ? plant.closest('.flower-container') : null;
+    const wtfNote = document.getElementById('wtf-note');
 
     if (!plant) return;
 
-    const VISIT_KEY = 'cozy_room_giant_plant_visited';
-    const isFirstVisit = !localStorage.getItem(VISIT_KEY);
+    // === СЧЁТЧИК ЗАГРУЗОК СТРАНИЦЫ ===
+    const VISIT_COUNT_KEY = 'cozy_room_plant_visit_count';
+    let visits = parseInt(localStorage.getItem(VISIT_COUNT_KEY) || '0', 10);
+    visits += 1;
+    localStorage.setItem(VISIT_COUNT_KEY, visits.toString());
 
-    if (isFirstVisit) {
-        localStorage.setItem(VISIT_KEY, 'true');
+    // Первые 5 загрузок аномалии гарантированно не появляются
+    if (visits <= 5) {
         return;
     }
 
-    const GIANT_PLANT_CHANCE = 0.02; // 5% шанс
-    const isGiantSpawned = Math.random() < GIANT_PLANT_CHANCE;
+    const GIANT_PLANT_CHANCE = 0.05; // 5% шанс гиганта
+    const CACTUS_CHANCE = 0.10;      // 10% шанс кактуса
 
-    if (isGiantSpawned) {
+    const roll = Math.random();
+
+    // Вспомогательная функция защиты от перетирания src сторонними скриптами
+    function lockPlantSrc(element, srcPath) {
+        Object.defineProperty(element, 'src', {
+            get: function() { return srcPath; },
+            set: function(val) {},
+            configurable: true
+        });
+
+        const originalSetAttribute = element.setAttribute.bind(element);
+        element.setAttribute = function(name, value) {
+            if (name === 'src') return;
+            originalSetAttribute(name, value);
+        };
+    }
+
+    if (roll < GIANT_PLANT_CHANCE) {
+        // === 1. ГИГАНТСКОЕ РАСТЕНИЕ ===
         const GIANT_SRC = 'assets/giant-plant.png';
 
         plant.src = GIANT_SRC;
         plant.classList.add('giant-plant');
 
-        // Отключаем кликабельность цветка
+        // Отключаем кликабельность
         plant.classList.remove('clickable');
-        if (flowerContainer) {
-            flowerContainer.classList.remove('clickable');
-        }
+        if (flowerContainer) flowerContainer.classList.remove('clickable');
 
-        // Защита от перетирания картинки
-        Object.defineProperty(plant, 'src', {
-            get: function() { return GIANT_SRC; },
-            set: function(val) {},
-            configurable: true
-        });
-
-        // ПОКАЗЫВАЕМ ЗАПИСКУ
+        // Показываем записку "Чё за..."
         if (wtfNote) {
             wtfNote.style.display = 'block';
-
-            // Обработка клика с анимацией исчезновения
             wtfNote.addEventListener('click', () => {
                 wtfNote.classList.add('pop-out');
-                
-                // Полностью скрываем из DOM после завершения анимации
-                setTimeout(() => {
-                    wtfNote.style.display = 'none';
-                }, 350);
+                setTimeout(() => { wtfNote.style.display = 'none'; }, 350);
             }, { once: true });
         }
+
+        lockPlantSrc(plant, GIANT_SRC);
+
+    } else if (roll < GIANT_PLANT_CHANCE + CACTUS_CHANCE) {
+        // === 2. КАКТУС (Спавнится ТОЛЬКО если не выпал гигант) ===
+        const CACTUS_SRC = 'assets/cactus.png';
+
+        plant.src = CACTUS_SRC;
+        plant.classList.add('cactus-plant');
+
+        // Отключаем кликабельность
+        plant.classList.remove('clickable');
+        if (flowerContainer) flowerContainer.classList.remove('clickable');
+
+        lockPlantSrc(plant, CACTUS_SRC);
     }
 })();
-
 
 (function initDinoScrollNote() {
     const dinoScroll = document.getElementById('dino-scroll');
@@ -1153,6 +1173,41 @@ if (ears) {
         
         setTimeout(() => {
             dinoOverlay.style.display = 'none';
+        }, 300);
+    });
+})();
+
+
+(function initLoveLetterModal() {
+    const loveLetter = document.getElementById('love-letter');
+    const loveOverlay = document.getElementById('love-letter-overlay');
+    const albumAudio = document.getElementById('Album_audio');
+
+    if (!loveLetter || !loveOverlay) return;
+
+    function playNoteSound() {
+        if (albumAudio) {
+            albumAudio.currentTime = 0;
+            albumAudio.play().catch(err => console.log("Ошибка звука:", err));
+        }
+    }
+
+    // Открытие письма
+    loveLetter.addEventListener('click', () => {
+        playNoteSound();
+        loveOverlay.style.display = 'flex';
+        setTimeout(() => {
+            loveOverlay.classList.add('active');
+        }, 10);
+    });
+
+    // Закрытие при клике в любое место
+    loveOverlay.addEventListener('click', () => {
+        playNoteSound();
+        loveOverlay.classList.remove('active');
+        
+        setTimeout(() => {
+            loveOverlay.style.display = 'none';
         }, 300);
     });
 })();
