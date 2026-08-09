@@ -31,7 +31,7 @@ function playBiteSound() {
   }
 }
 
-// Функция показа записки (для пиццы)
+// Функция показа записки (для пиццы и томатов)
 function showCard(cardSrc, delay) {
   if (!cardSrc) return;
   
@@ -76,7 +76,19 @@ if (isTomatoSpawned && tomato) {
       tomato.src = tomatoStates[currentTomatoIndex];
     }
 
-    // Записки отключены, пока не нарисуешь отдельные для томатов!
+    // Записки для томата
+    let nextCardSrc = null;
+    switch (currentTomatoIndex) {
+      case 1:
+        nextCardSrc = 'assets/tomato_states/note_1.png'; // Первый укус
+        break;
+      case 4:
+        nextCardSrc = 'assets/tomato_states/note-2.png'; // Последний укус
+        break;
+    }
+
+    const appearanceDelay = (currentTomatoIndex === 4) ? 1000 : 50;
+    showCard(nextCardSrc, appearanceDelay);
   });
 
 } else if (pizza) {
@@ -128,7 +140,6 @@ if (isTomatoSpawned && tomato) {
     showCard(nextCardSrc, appearanceDelay);
   });
 }
-
 
 
 
@@ -865,3 +876,283 @@ if (chocolate && chocolateSpeech) {
     }, 1000);
   });
 }
+
+const ears = document.getElementById('ears');
+
+const EARS_CHANCE = 0.10; // 10% шанс появления (поставь 1.0 для теста)
+const isEarsFirstVisit = !localStorage.getItem('cozy_room_visited');
+
+if (ears) {
+  // 1. Проверка первого посещения и спавна
+  if (isEarsFirstVisit) {
+    ears.style.display = 'none';
+  } else {
+    const isEarsSpawned = Math.random() < EARS_CHANCE;
+    ears.style.display = isEarsSpawned ? 'block' : 'none';
+  }
+
+  // 2. Реакция на клик: анимация шевеления ушек
+  ears.addEventListener('click', () => {
+    // Сбрасываем класс, если анимация уже идет
+    ears.classList.remove('ears-twitch');
+    void ears.offsetWidth; // Форсируем reflow для перезапуска
+    ears.classList.add('ears-twitch');
+
+    // Удаляем класс после завершения анимации (400 мс)
+    setTimeout(() => {
+      ears.classList.remove('ears-twitch');
+    }, 400);
+  });
+}
+
+
+(function initFoxEarsNote() {
+    const ears = document.getElementById('ears');
+    const foxNote = document.getElementById('fox-note');
+
+    if (!ears || !foxNote) return;
+
+    // Функция показа записки
+    function showNote() {
+        foxNote.classList.remove('fade-out-note');
+        foxNote.style.display = 'block';
+        foxNote.classList.add('fade-in-note');
+    }
+
+    // Функция скрытия записки
+    function hideNote() {
+        foxNote.classList.remove('fade-in-note');
+        foxNote.classList.add('fade-out-note');
+        
+        setTimeout(() => {
+            foxNote.style.display = 'none';
+            foxNote.classList.remove('fade-out-note');
+        }, 200);
+    }
+
+    // Клик по ушкам — переключаем записку
+    ears.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (foxNote.style.display === 'none' || foxNote.style.display === '') {
+            showNote();
+        } else {
+            hideNote();
+        }
+    });
+
+    // Клик по самой записке — закрывает её
+    foxNote.addEventListener('click', (e) => {
+        e.stopPropagation();
+        hideNote();
+    });
+})();
+
+
+
+// Используем изолированную функцию, чтобы не ломать чужие переменные
+(function initCozyChanger() {
+    const catContainer = document.getElementById('catContainer');
+    const bear = document.getElementById('bear');
+    const loveLetter = document.getElementById('love-letter');
+    const gamepad = document.getElementById('gamepad');
+    const chocolate = document.getElementById('chocolate');
+
+    if (!catContainer) return;
+
+    // Уникальный ключ посещения для этой механики
+    const VISIT_KEY = 'cozy_room_cat_letter_visited';
+    const isFirstVisit = !localStorage.getItem(VISIT_KEY);
+
+    // При первом визите — кот на месте, медведь на месте, письма нет
+    if (isFirstVisit) {
+        localStorage.setItem(VISIT_KEY, 'true');
+        catContainer.classList.add('cat-default-pos');
+        if (bear) bear.style.display = 'block';
+        if (loveLetter) loveLetter.style.display = 'none';
+        return;
+    }
+
+    // Шансы появления (настрой под себя)
+    const CAT_IN_CHAIR_CHANCE = 0.1; // 15% шанс
+    const GAMEPAD_CHANCE = 0.25;
+    const CHOCOLATE_CHANCE = 0.20;
+
+    // Сбрасываем позиционные классы кота
+    catContainer.classList.remove('cat-default-pos', 'cat-chair-pos');
+
+    const isCatInChair = Math.random() < CAT_IN_CHAIR_CHANCE;
+
+    if (isCatInChair) {
+        // === КОТ ПЕРЕСЕЛ В КРЕСЛО ===
+        catContainer.classList.add('cat-chair-pos'); // Кот уходит в кресло
+        if (bear) bear.style.display = 'none';        // Медведь пропадает
+        if (loveLetter) loveLetter.style.display = 'block'; // ПИСЬМО ПОЯВЛЯЕТСЯ на старом месте кота
+
+        // Геймпад и шоколадка НЕ спавнятся
+        if (gamepad) gamepad.style.display = 'none';
+        if (chocolate) chocolate.style.display = 'none';
+
+    } else {
+        // === КОТ НА ОБЫЧНОМ МЕСТЕ ===
+        catContainer.classList.add('cat-default-pos'); // Кот на дефолтном месте
+        if (bear) bear.style.display = 'block';        // Медведь в кресле
+        if (loveLetter) loveLetter.style.display = 'none'; // Письма нет
+
+        // Обычный спавн предметов
+        if (gamepad) {
+            gamepad.style.display = Math.random() < GAMEPAD_CHANCE ? 'block' : 'none';
+        }
+        if (chocolate) {
+            chocolate.style.display = Math.random() < CHOCOLATE_CHANCE ? 'block' : 'none';
+        }
+    }
+})();
+
+
+(function initCameraEasterEgg() {
+    const camera = document.getElementById('camera');
+    const yarnsContainer = document.querySelector('.yarns-container');
+    const flashOverlay = document.getElementById('flash-overlay');
+    const cameraAudio = document.getElementById('camera_click_audio');
+
+    if (!camera || !yarnsContainer) return;
+
+    const VISIT_KEY = 'cozy_room_camera_visited';
+    const isFirstVisit = !localStorage.getItem(VISIT_KEY);
+
+    // В первый запуск пасхалка гарантированно не появляется
+    if (isFirstVisit) {
+        localStorage.setItem(VISIT_KEY, 'true');
+        camera.style.display = 'none';
+        yarnsContainer.style.display = 'block';
+        return;
+    }
+
+    const CAMERA_CHANCE = 0.10; // 10% шанс появления камеры вместо пряжи
+    const isCameraSpawned = Math.random() < CAMERA_CHANCE;
+
+    if (isCameraSpawned) {
+        camera.style.display = 'block';
+        yarnsContainer.style.display = 'none';
+    } else {
+        camera.style.display = 'none';
+        yarnsContainer.style.display = 'block';
+    }
+
+    // Клик по фотоаппарату: звук затвора, вспышка и исчезновение
+    camera.addEventListener('click', () => {
+        // Проигрываем звук затвора
+        if (cameraAudio) {
+            cameraAudio.currentTime = 0;
+            cameraAudio.play().catch(err => console.log("Ошибка аудио камеры:", err));
+        }
+
+        if (flashOverlay) {
+            flashOverlay.classList.remove('fade-out');
+            flashOverlay.classList.add('active');
+
+            setTimeout(() => {
+                // Фотоаппарат исчезает в момент белого экрана
+                camera.style.display = 'none';
+
+                // Плавно гасим белое свечение
+                flashOverlay.classList.remove('active');
+                flashOverlay.classList.add('fade-out');
+            }, 100);
+        } else {
+            camera.style.display = 'none';
+        }
+    });
+})();
+
+
+(function initGiantPlantEasterEgg() {
+    const plant = document.getElementById('plant');
+    const wtfNote = document.getElementById('wtf-note');
+    const flowerContainer = plant ? plant.closest('.flower-container') : null;
+
+    if (!plant) return;
+
+    const VISIT_KEY = 'cozy_room_giant_plant_visited';
+    const isFirstVisit = !localStorage.getItem(VISIT_KEY);
+
+    if (isFirstVisit) {
+        localStorage.setItem(VISIT_KEY, 'true');
+        return;
+    }
+
+    const GIANT_PLANT_CHANCE = 0.02; // 5% шанс
+    const isGiantSpawned = Math.random() < GIANT_PLANT_CHANCE;
+
+    if (isGiantSpawned) {
+        const GIANT_SRC = 'assets/giant-plant.png';
+
+        plant.src = GIANT_SRC;
+        plant.classList.add('giant-plant');
+
+        // Отключаем кликабельность цветка
+        plant.classList.remove('clickable');
+        if (flowerContainer) {
+            flowerContainer.classList.remove('clickable');
+        }
+
+        // Защита от перетирания картинки
+        Object.defineProperty(plant, 'src', {
+            get: function() { return GIANT_SRC; },
+            set: function(val) {},
+            configurable: true
+        });
+
+        // ПОКАЗЫВАЕМ ЗАПИСКУ
+        if (wtfNote) {
+            wtfNote.style.display = 'block';
+
+            // Обработка клика с анимацией исчезновения
+            wtfNote.addEventListener('click', () => {
+                wtfNote.classList.add('pop-out');
+                
+                // Полностью скрываем из DOM после завершения анимации
+                setTimeout(() => {
+                    wtfNote.style.display = 'none';
+                }, 350);
+            }, { once: true });
+        }
+    }
+})();
+
+
+(function initDinoScrollNote() {
+    const dinoScroll = document.getElementById('dino-scroll');
+    const dinoOverlay = document.getElementById('dino-note-overlay');
+    const albumAudio = document.getElementById('Album_audio');
+
+    if (!dinoScroll || !dinoOverlay) return;
+
+    // Воспроизведение звука листания/бумаги
+    function playNoteSound() {
+        if (albumAudio) {
+            albumAudio.currentTime = 0;
+            albumAudio.play().catch(err => console.log("Ошибка звука:", err));
+        }
+    }
+
+    // Открытие модалки
+    dinoScroll.addEventListener('click', () => {
+        playNoteSound();
+        dinoOverlay.style.display = 'flex';
+        // Небольшой таймаут для работы CSS-перехода opacity
+        setTimeout(() => {
+            dinoOverlay.classList.add('active');
+        }, 10);
+    });
+
+    // Закрытие модалки при клике на любое место оверлея или картинку
+    dinoOverlay.addEventListener('click', () => {
+        playNoteSound();
+        dinoOverlay.classList.remove('active');
+        
+        setTimeout(() => {
+            dinoOverlay.style.display = 'none';
+        }, 300);
+    });
+})();

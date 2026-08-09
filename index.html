@@ -68,6 +68,13 @@
          alt="">
      </div>
 
+<img id="camera"
+     class="object clickable"
+     src="assets/camera.png"
+     alt="Фотоаппарат"
+     style="display: none;">
+
+
 
      <img id="comb" class="object" src="assets/brush.png" alt="Расчёска" style="display: none;">
      
@@ -102,7 +109,11 @@
     <img id="plant" src="assets/flower_states/flower_state1.png" alt="Растение">
 </div>
 
-
+<img id="wtf-note" 
+     class="clickable" 
+     src="assets/WTF_note.png" 
+     alt="Записка" 
+     style="display: none;">
 
     <img id="dino"
          class="object clickable"
@@ -135,6 +146,11 @@
      <img id="lamp_bulb"
          class="object clickable"
          src="assets/lamp_bulb.png"
+         alt="">
+
+     <img id="ears"
+         class="object clickable"
+         src="assets/fox_ears.png"
          alt="">
      
 
@@ -188,6 +204,7 @@
      src="assets/shokolade_message.png"
      alt="Сообщение"
      style="display: none;">
+
 
 
     <img id="chairFront"
@@ -311,6 +328,13 @@
      style="display: none;">
 
 
+    <img id="love-letter"
+     class="object clickable"
+     src="assets/Love_letter.png"
+     alt="Письмо"
+     style="display: none;">
+
+
 
     <!-- ========================= -->
     <!-- ОСВЕЩЕНИЕ -->
@@ -416,7 +440,11 @@
   <img id="flowerNoteImage" class="flower-note-paper" src="assets/flower_states/квіточка.png" alt="Записка цветка">
 </div>
 
-
+<img id="fox-note"
+     class="object clickable"
+     src="assets/fox-note.png"
+     alt="Записка"
+     style="display: none;">
 
 <!-- Модальное окно луны -->
 <div id="moon-modal-overlay" class="moon-modal-overlay">
@@ -425,6 +453,16 @@
   </div>
 </div>
 
+
+<div id="dino-note-overlay" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <img src="assets/dino_note.png" alt="Записка динозаврика" id="dino-note-img">
+    </div>
+</div>
+
+
+
+<div id="flash-overlay"></div>
 
 <audio id="playerMusic" loop></audio>
 
@@ -453,6 +491,8 @@
 <!-- Звуки бота-паучка -->
 <audio id="Spider_hover_audio" src="audio/bot-hover-beep.wav"></audio>
 <audio id="Spider_click_audio" src="audio/bot-click-beep.wav"></audio>
+<audio id="camera_click_audio" src="audio/camera-click.mp3"></audio>
+
 
 
 <script src="js/main.js"></script>

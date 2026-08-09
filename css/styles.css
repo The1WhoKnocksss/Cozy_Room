@@ -522,6 +522,41 @@ body{
 }
 
 
+
+#plant.giant-plant {
+    width: 700%;
+    top: -93%;
+    left: -405%;
+    
+    transform-origin: 53% 22%; 
+    z-index: 4; /* Выше 3, как и требовалось */
+
+    /* Отключаем курсор-указатель и клики */
+    cursor: default !important;
+    pointer-events: none !important;
+
+    /* Включаем ускорение GPU для убирания лагов */
+    will-change: transform;
+    backface-visibility: hidden;
+
+    /* Оптимизированная анимация без масштабирования */
+    animation: giant-breeze 7s ease-in-out infinite;
+}
+
+/* Оптимизированная анимация: только поворот со смещением по оси Z (задействует видеокарту) */
+@keyframes giant-breeze {
+    0%, 100% {
+        transform: translateZ(0) rotate(0deg);
+    }
+    33% {
+        transform: translateZ(0) rotate(-1.5deg);
+    }
+    66% {
+        transform: translateZ(0) rotate(1.8deg);
+    }
+}
+
+
 /* Полноэкранный темный фон с размытием для цветка */
 .flower-note-backdrop {
   position: fixed;
@@ -736,6 +771,16 @@ body{
 
 
 
+
+#ears {
+    left:32.8%;
+    top:-3%;
+    z-index: 2;
+    width:14%;
+}
+
+
+
 /* ============================
             СТОЛ
 ============================ */
@@ -838,6 +883,8 @@ body{
 }
 
 
+
+
 #chairFront{
 
     left:0%;
@@ -854,90 +901,79 @@ body{
 /* ============================
             КОТ
 ============================ */
-
+/* Базовый контейнер кота (общие стили) */
 #catContainer {
-    position:absolute;
-
-    left:35%;
-    top:35%;
-    width:26%;
+    position: absolute;
+    width: 26%;
+    z-index: 5; /* Исходный z-index на случай стандартного места */
 }
 
-#cat{
+/* Обычное место кота (по умолчанию) */
+#catContainer.cat-default-pos {
+    left: 35%;
+    top: 34.5%;
+    z-index: 1;
+}
 
-    
-    width:100%;
+/* Кот в кресле (перекрывает ID за счет комбинации #catContainer.cat-chair-pos) */
+#catContainer.cat-chair-pos {
+    left: 0%;   /* Координаты кресла */
+    top: 53%;   /* Координаты кресла */
+    z-index: 2; /* Между chairBack (z-index: 1) и chairFront (z-index: 4) */
+}
+
+#cat {
+    width: 100%;
     display: block;
-
 }
 
-.sleep{
-
-    position:absolute;
+/* --- АНИМАЦИЯ Z-Z-Z --- */
+.sleep {
+    position: absolute;
     top: 10%;
-    font-family:Arial, sans-serif;
-    font-weight:bold;
-
-    color:white;
-
-    text-shadow:
-        0 0 4px rgba(255,255,255,.6);
-
-    opacity:0;
-
-    pointer-events:none;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 0 4px rgba(255, 255, 255, 0.6);
+    opacity: 0;
+    pointer-events: none;
     z-index: 10;
-
 }
 
-.z1{
-
-    left:75%;
-    top:100%;
-
-    font-size:80%;
-
-    animation:sleepZ 4s infinite;
+.z1 {
+    left: 75%;
+    top: 100%;
+    font-size: 80%;
+    animation: sleepZ 4s infinite;
 }
 
-.z2{
-
-    left:78%;
-    top:28%;
-
-    font-size:90%;
-
-    animation:sleepZ 4s infinite 1.2s;
+.z2 {
+    left: 78%;
+    top: 28%;
+    font-size: 90%;
+    animation: sleepZ 4s infinite 1.2s;
 }
 
-.z3{
-
-    left:80%;
+.z3 {
+    left: 80%;
     top: 45%;
-
-    font-size:100%;
-
-    animation:sleepZ 4s infinite 2.4s;
+    font-size: 100%;
+    animation: sleepZ 4s infinite 2.4s;
 }
 
 @keyframes sleepZ {
-
-    0%{
+    0% {
         opacity: 0;
         transform: translate(0em, 2.5em) scale(0.5);
     }
-
-    20%{
+    20% {
         opacity: 1;
     }
-
-    100%{
+    100% {
         opacity: 0;
         transform: translate(0.6em, -2.5em) scale(1.4);
     }
-
 }
-
 
 
 
@@ -1821,4 +1857,192 @@ rgba(0,0,0,.18)
 #chocolateSpeech.pop-visible {
     opacity: 1;
     transform: scale(1) rotate(0deg);
+}
+
+
+#love-letter {
+    position: absolute;
+    left: 40%;         /* Слегка сместим в центр старой зоны кота */
+    top: 48%;          /* Настрой высоту под стол/тумбу */
+    width: 14%;         /* Размер письма */
+    z-index: 2;
+    transition: transform 0.2s ease;
+}
+
+#love-letter:hover {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Вспышка на весь экран */
+#flash-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #ffffff;
+    z-index: 99999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.05s ease-in;
+}
+
+#flash-overlay.active {
+    opacity: 1;
+}
+
+#flash-overlay.fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+}
+
+/* Настройки позиции фотоаппарата */
+#camera {
+    position: absolute;
+    /* Укажи те же left/top, что и у .yarns-container */
+    left: 5%;
+    top: 1.5%;
+    width: 11%;
+    z-index: 2;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+#camera:hover {
+    transform: scale(1.08);
+}
+
+/* Позиция записки-облачка рядом с аномалией */
+#wtf-note {
+    position: absolute;
+    left: 0%;                  /* Позиция по горизонтали (настрой под свой кадр) */
+    top: 70%;                   /* Высота над горшком/окном */
+    width: 30%;                 /* Размер облачка */
+    z-index: 10;                /* Поверх растения и остальных слоев */
+    cursor: pointer;
+    transform-origin: bottom left;
+    transition: transform 0.2s ease;
+    animation: note-float 3s ease-in-out infinite alternate;
+}
+
+#wtf-note:hover {
+    transform: scale(1.08);
+}
+
+/* Легкое покачивание облачка мысли */
+@keyframes note-float {
+    0% { transform: translateY(0px) rotate(0deg); }
+    100% { transform: translateY(-6px) rotate(2deg); }
+}
+
+/* Анимация исчезновения при клике */
+#wtf-note.pop-out {
+    animation: note-pop-anim 0.35s ease-out forwards !important;
+    pointer-events: none;
+}
+
+@keyframes note-pop-anim {
+    0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.2) translateY(-10px); /* Легкий "хлопок" вверх */
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.2) translateY(-25px); /* Уменьшается и исчезает */
+    }
+}
+
+#fox-note {
+    position: absolute;
+    left: 35%;          /* Настрой позицию появления записки */
+    top: 67%;
+    width: 30%;         /* Размер записки */
+    z-index: 10;
+    cursor: pointer;
+    transform-origin: bottom center;
+    transition: transform 0.2s ease;
+}
+
+#fox-note:hover {
+    transform: scale(1.04);
+}
+
+/* Анимация плавного появления */
+.fade-in-note {
+    animation: noteAppear 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
+}
+
+/* Анимация закрытия */
+.fade-out-note {
+    animation: noteDisappear 0.2s ease-in forwards;
+}
+
+@keyframes noteAppear {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) translateY(15px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes noteDisappear {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.7) translateY(10px);
+    }
+}
+
+
+/* Полноэкранный темный блюр-фон */
+#dino-note-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px); /* Задник темнеет и блюрится */
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* Активное состояние модалки */
+#dino-note-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Позиционирование самой картинки записки */
+#dino-note-overlay .modal-content {
+    transform: scale(0.8);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+}
+
+#dino-note-overlay.active .modal-content {
+    transform: scale(1);
+}
+
+#dino-note-img {
+    max-width: 80vw;
+    max-height: 80vh;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 25px rgba(0,0,0,0.5));
+    cursor: pointer;
 }
