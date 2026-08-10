@@ -294,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const IMAGE_EXTENSION = ".png";
     const TOTAL_PAGES = 11;
     const ALBUM_SOUND_VOLUME = 0.05;
-    const DEUTSCH_CHANCE = 0.05; // 5% шанс при каждой загрузке страницы
+    const DEUTSCH_CHANCE = 0.02; // 5% шанс при каждой загрузке страницы
 
     // Находим элементы
     const albumOverlay = document.getElementById('album-page-overlay');

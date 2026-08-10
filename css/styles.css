@@ -84,7 +84,7 @@ body{
 
     left:0,3%;
     top:16%;
-
+    z-index: 0;
     width:37%;
 
 }
@@ -256,7 +256,7 @@ body{
     position: absolute;
     top: 11%;   /* Настрой под высоту полки, где стояла банка */
     left: 17%;  /* Настрой горизонтальное положение */
-    z-index: 2;
+    z-index: 1;
     width: 19%;
 }
 
@@ -265,7 +265,7 @@ body{
     position: absolute;
     top: 2%;   
     left: 20%;  
-    z-index: 2;
+    z-index: 1;
     display: inline-flex;
     flex-direction: column;
     align-items: center;
@@ -926,7 +926,7 @@ body{
 #catContainer.cat-default-pos {
     left: 35%;
     top: 34.5%;
-    z-index: 1;
+    z-index: 2;
 }
 
 /* Кот в кресле (перекрывает ID за счет комбинации #catContainer.cat-chair-pos) */
@@ -1189,6 +1189,7 @@ body{
   
   gap: 0%; /* Начальный зазор между пазлами (можно убрать в 0, если они встык) */
   cursor: pointer;
+  z-index: 3;
 }
 
 #puzzleLeft, #puzzleRight {
@@ -1941,7 +1942,7 @@ rgba(0,0,0,.18)
     left: 5%;
     top: 1.5%;
     width: 11%;
-    z-index: 2;
+    z-index: 1;
     cursor: pointer;
     transition: transform 0.2s ease;
 }
@@ -1949,6 +1950,23 @@ rgba(0,0,0,.18)
 #camera:hover {
     transform: scale(1.08);
 }
+
+
+
+#painting {
+    position: absolute;
+
+    left: 0.3%;
+    top: 0%;
+    width: 45%;
+    z-index: 2;
+    filter: brightness(0.83) saturate(0.8) contrast(0.85);
+    display: none;
+    
+}
+
+
+
 
 /* Позиция записки-облачка рядом с аномалией */
 #wtf-note {
@@ -2126,3 +2144,4 @@ rgba(0,0,0,.18)
     filter: drop-shadow(0 10px 25px rgba(255, 105, 180, 0.2));
     cursor: pointer;
 }
+

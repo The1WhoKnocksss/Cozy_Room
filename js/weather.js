@@ -23,7 +23,7 @@ function checkPinkAnomalyEligibility() {
   }
 
   // Начиная с 6-й загрузки — 3% шанс
-  const PINK_CHANCE = 0.03;
+  const PINK_CHANCE = 0.02;
   return Math.random() < PINK_CHANCE;
 }
 

@@ -5,7 +5,7 @@ const pizzaCard = document.getElementById('pizzaCard');
 const pizzaAudio = document.getElementById('Pizza_audio');
 
 const PIZZA_SOUND_VOLUME = 0.03;
-const TOMATO_CHANCE = 0.20;
+const TOMATO_CHANCE = 0.15;
 
 // Проверка первого визита в браузере
 const hasVisitedBefore = localStorage.getItem('cozy_room_visited');
@@ -240,8 +240,8 @@ if (jarAudio) jarAudio.volume = 0.07;
 if (jarBreakAudio) jarBreakAudio.volume = 0.1;
 if (bflyAudio) bflyAudio.volume = 0.4;
 
-if (spiderHoverAudio) spiderHoverAudio.volume = 0.07; // Тихий "вопросительный" бип
-if (spiderClickAudio) spiderClickAudio.volume = 0.3; // Громкий бип при клике
+if (spiderHoverAudio) spiderHoverAudio.volume = 0.05; // Тихий "вопросительный" бип
+if (spiderClickAudio) spiderClickAudio.volume = 0.1; // Громкий бип при клике
 
 const maxClicks = Math.floor(Math.random() * (7 - 4 + 1)) + 4;
 let currentClicks = 0;
@@ -259,7 +259,7 @@ if (lastBreakDate === today) {
     if (jar) jar.style.display = 'none';
 
     // 30% шанс на появление пасхалки
-    const EASTER_EGG_CHANCE = 0.30;
+    const EASTER_EGG_CHANCE = 0.2;
     if (Math.random() < EASTER_EGG_CHANCE) {
         // Выбираем строго одно: ИЛИ расчёска (comb), ИЛИ паук (spider)
         const chosenEgg = Math.random() < 0.5 ? 'comb' : 'spider';
@@ -653,7 +653,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 const dreamcatcher = document.getElementById('dreamcatcher');
-const DREAMCATCHER_CHANCE = 0.15; // Поставь 1.0 для теста
+const DREAMCATCHER_CHANCE = 0.10; // Поставь 1.0 для теста
 
 // Используем уникальное имя переменной, чтобы не было конфликта
 const isFirstVisit = !localStorage.getItem('cozy_room_visited');
@@ -678,7 +678,7 @@ if (dreamcatcher) {
 
 const gamepad = document.getElementById('gamepad');
 const xboxAudio = document.getElementById('xbox_360_audio');
-const GAMEPAD_CHANCE = 0.20; // 10% шанс появления
+const GAMEPAD_CHANCE = 0.15; // 10% шанс появления
 
 const isGamepadFirstVisit = !localStorage.getItem('cozy_room_visited');
 
@@ -748,7 +748,7 @@ if (dino && dinoScroll) {
 
 const magicStick = document.getElementById('magicStick');
 const magicStickAudio = document.getElementById('Magic_stick_sound');
-const MAGIC_STICK_CHANCE = 0.15;
+const MAGIC_STICK_CHANCE = 0.1;
 
 const isStickFirstVisit = !localStorage.getItem('cozy_room_visited');
 
@@ -822,7 +822,7 @@ const chocolate = document.getElementById('chocolate');
 const chocolateSpeech = document.getElementById('chocolateSpeech');
 const chocoEatAudio = document.getElementById('Pizza_audio');
 
-const CHOCOLATE_CHANCE = 0.2; // 20% шанс появления (поставь 1.0 для теста)
+const CHOCOLATE_CHANCE = 0.15; // 20% шанс появления (поставь 1.0 для теста)
 const isChocolateFirstVisit = !localStorage.getItem('cozy_room_visited');
 
 if (chocolate && chocolateSpeech) {
@@ -879,7 +879,7 @@ if (chocolate && chocolateSpeech) {
 
 const ears = document.getElementById('ears');
 
-const EARS_CHANCE = 0.10; // 10% шанс появления (поставь 1.0 для теста)
+const EARS_CHANCE = 0.07; // 10% шанс появления (поставь 1.0 для теста)
 const isEarsFirstVisit = !localStorage.getItem('cozy_room_visited');
 
 if (ears) {
@@ -973,9 +973,9 @@ if (ears) {
     }
 
     // Шансы появления (настрой под себя)
-    const CAT_IN_CHAIR_CHANCE = 0.1; // 15% шанс
-    const GAMEPAD_CHANCE = 0.25;
-    const CHOCOLATE_CHANCE = 0.20;
+    const CAT_IN_CHAIR_CHANCE = 0.05; // 15% шанс
+    const GAMEPAD_CHANCE = 0.2;
+    const CHOCOLATE_CHANCE = 0.15;
 
     // Сбрасываем позиционные классы кота
     catContainer.classList.remove('cat-default-pos', 'cat-chair-pos');
@@ -1084,8 +1084,8 @@ if (ears) {
         return;
     }
 
-    const GIANT_PLANT_CHANCE = 0.05; // 5% шанс гиганта
-    const CACTUS_CHANCE = 0.10;      // 10% шанс кактуса
+    const GIANT_PLANT_CHANCE = 0.01; // 5% шанс гиганта
+    const CACTUS_CHANCE = 0.07;      // 10% шанс кактуса
 
     const roll = Math.random();
 
@@ -1211,3 +1211,27 @@ if (ears) {
         }, 300);
     });
 })();
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const painting = document.getElementById('painting');
+    if (!painting) return;
+
+    // === СЧЁТЧИК ЗАГРУЗОК СТРАНИЦЫ ===
+    const VISIT_COUNT_KEY = 'cozy_room_painting_visit_count';
+    let visits = parseInt(localStorage.getItem(VISIT_COUNT_KEY) || '0', 10);
+    visits += 1;
+    localStorage.setItem(VISIT_COUNT_KEY, visits.toString());
+
+    // Первые 5 загрузок гарантированно спрятано
+    if (visits <= 5) {
+        painting.style.display = 'none';
+        return;
+    }
+
+    // 5% шанс появления начиная с 6-го захода
+    const SPAWN_CHANCE = 0.04;
+    const isSpawned = Math.random() < SPAWN_CHANCE;
+
+    painting.style.display = isSpawned ? 'block' : 'none';
+});
