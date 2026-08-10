@@ -109,7 +109,7 @@ const playerMusic = document.getElementById('playerMusic');
 
 // 1. Массив со всеми 7 песнями и их картинками
 const playlist = [
-  { audio: 'audio/mp1.mp3', image: 'assets/mp3player/mp3player_1.png' }, // Индекс 0 — для первого захода
+  { audio: 'audio/mp1.mp3', image: 'assets/mp3player/mp3player_1.png' }, // Индекс 0 — гарантирован на весь первый день
   { audio: 'audio/mp2.mp3', image: 'assets/mp3player/mp3player_2.png' },
   { audio: 'audio/mp3.mp3', image: 'assets/mp3player/mp3player_3.png' },
   { audio: 'audio/mp4.mp3', image: 'assets/mp3player/mp3player_4.png' },
@@ -118,16 +118,24 @@ const playlist = [
   { audio: 'audio/mp7.mp3', image: 'assets/mp3player/mp3player_7.png' }
 ];
 
-// 2. Функция выбора трека
+// 2. Функция выбора трека (фиксация первого трека на весь первый день)
 function getTodayTrack() {
   const FIRST_VISIT_INDEX = 0; 
-  const hasVisited = localStorage.getItem('hasVisitedPlayer');
+  const todayString = new Date().toDateString();
+  let firstVisitDate = localStorage.getItem('playerFirstVisitDate');
 
-  if (!hasVisited) {
-    localStorage.setItem('hasVisitedPlayer', 'true');
+  // Если зашли впервые за всё время — запоминаем дату первого посещения
+  if (!firstVisitDate) {
+    firstVisitDate = todayString;
+    localStorage.setItem('playerFirstVisitDate', firstVisitDate);
+  }
+
+  // Весь первый день захода будет играться песня №1
+  if (todayString === firstVisitDate) {
     return playlist[FIRST_VISIT_INDEX];
   }
 
+  // Начиная со второго дня включается ежедневная ротация
   const now = new Date();
   const startOfYear = new Date(now.getFullYear(), 0, 0);
   const diff = now - startOfYear;
@@ -188,7 +196,6 @@ playerOverlay.addEventListener('click', () => {
   // Оповещаем фоновую музыку, что плеер закрылся
   window.dispatchEvent(new CustomEvent('playerClosed'));
 });
-
 
 
 
