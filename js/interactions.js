@@ -1009,61 +1009,95 @@ if (ears) {
 })();
 
 
-(function initCameraEasterEgg() {
+document.addEventListener("DOMContentLoaded", () => {
+    const yarnsContainer = document.querySelector('.yarns-container') || document.getElementById('yarns');
     const camera = document.getElementById('camera');
-    const yarnsContainer = document.querySelector('.yarns-container');
-    const flashOverlay = document.getElementById('flash-overlay');
     const cameraAudio = document.getElementById('camera_click_audio');
+    const flashOverlay = document.getElementById('flash-overlay');
 
-    if (!camera || !yarnsContainer) return;
+    const lum = document.getElementById('lum');
+    const lumSound = document.getElementById('lum_sound');
 
-    const VISIT_KEY = 'cozy_room_camera_visited';
-    const isFirstVisit = !localStorage.getItem(VISIT_KEY);
+    // === 1. ОБЩИЙ СЧЁТЧИК ВИЗИТОВ ===
+    const VISIT_KEY = 'cozy_room_visit_count';
+    let visits = parseInt(localStorage.getItem(VISIT_KEY) || '0', 10);
+    visits += 1;
+    localStorage.setItem(VISIT_KEY, visits.toString());
 
-    // В первый запуск пасхалка гарантированно не появляется
-    if (isFirstVisit) {
-        localStorage.setItem(VISIT_KEY, 'true');
-        camera.style.display = 'none';
-        yarnsContainer.style.display = 'block';
-        return;
-    }
+    const MIN_VISITS = 5; // Защита первых 5 загрузок
 
-    const CAMERA_CHANCE = 0.10; // 10% шанс появления камеры вместо пряжи
+    // Прячем всё перед проверкой шансов
+    if (camera) camera.style.display = 'none';
+    if (lum) lum.style.display = 'none';
+    if (yarnsContainer) yarnsContainer.style.display = 'block';
+
+    // Если защита еще действует, оставляем только пряжу
+    if (visits <= MIN_VISITS) return;
+
+    // === 2. ИЕРАРХИЯ СПАВНА (Камера -> Люм -> Пряжа) ===
+    const CAMERA_CHANCE = 0.10; // 10% шанс
+    const LUM_CHANCE = 0.07;    // 5% шанс
+
     const isCameraSpawned = Math.random() < CAMERA_CHANCE;
+    // Люм проверяется ТОЛЬКО если камера НЕ выпала
+    const isLumSpawned = !isCameraSpawned && (Math.random() < LUM_CHANCE);
 
-    if (isCameraSpawned) {
+    if (isCameraSpawned && camera) {
         camera.style.display = 'block';
-        yarnsContainer.style.display = 'none';
-    } else {
-        camera.style.display = 'none';
-        yarnsContainer.style.display = 'block';
+        if (yarnsContainer) yarnsContainer.style.display = 'none';
+    } else if (isLumSpawned && lum) {
+        lum.style.display = 'block';
+        if (yarnsContainer) yarnsContainer.style.display = 'none';
     }
 
-    // Клик по фотоаппарату: звук затвора, вспышка и исчезновение
-    camera.addEventListener('click', () => {
-        // Проигрываем звук затвора
-        if (cameraAudio) {
-            cameraAudio.currentTime = 0;
-            cameraAudio.play().catch(err => console.log("Ошибка аудио камеры:", err));
-        }
+    // === 3. КЛИК ПО ФОТОАППАРАТУ ===
+    if (camera) {
+        camera.addEventListener('click', () => {
+            if (cameraAudio) {
+                cameraAudio.currentTime = 0;
+                cameraAudio.play().catch(err => console.log("Ошибка аудио камеры:", err));
+            }
 
-        if (flashOverlay) {
-            flashOverlay.classList.remove('fade-out');
-            flashOverlay.classList.add('active');
+            if (flashOverlay) {
+                flashOverlay.classList.remove('fade-out');
+                flashOverlay.classList.add('active');
+
+                setTimeout(() => {
+                    camera.style.display = 'none';
+                    flashOverlay.classList.remove('active');
+                    flashOverlay.classList.add('fade-out');
+                }, 100);
+            } else {
+                camera.style.display = 'none';
+            }
+        });
+    }
+
+    // === 4. КЛИК ПО ЛЮМУ (СБОР И РЕСПАВН) ===
+    if (lum) {
+        lum.addEventListener('click', () => {
+            if (lum.classList.contains('lum-collected') || lum.classList.contains('lum-appearing')) return;
+
+            if (lumSound) {
+                lumSound.volume = 0.3;
+                lumSound.currentTime = 0;
+                lumSound.play().catch(err => console.log('Ошибка звука Люма:', err));
+            }
+
+            lum.classList.add('lum-collected');
 
             setTimeout(() => {
-                // Фотоаппарат исчезает в момент белого экрана
-                camera.style.display = 'none';
+                lum.classList.remove('lum-collected');
+                lum.classList.add('lum-appearing');
 
-                // Плавно гасим белое свечение
-                flashOverlay.classList.remove('active');
-                flashOverlay.classList.add('fade-out');
-            }, 100);
-        } else {
-            camera.style.display = 'none';
-        }
-    });
-})();
+                setTimeout(() => {
+                    lum.classList.remove('lum-appearing');
+                }, 1200);
+
+            }, 10000);
+        });
+    }
+});
 
 
 (function initPlantAnomalies() {
@@ -1229,9 +1263,28 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    // 5% шанс появления начиная с 6-го захода
+    // 4% шанс появления начиная с 6-го захода
     const SPAWN_CHANCE = 0.04;
     const isSpawned = Math.random() < SPAWN_CHANCE;
 
-    painting.style.display = isSpawned ? 'block' : 'none';
+    if (isSpawned) {
+        // === ПРОВЕРКА НА АЛЬТЕРНАТИВНУЮ КАРТИНУ (40% ШАНС) ===
+        const ALT_PAINTING_CHANCE = 0.40;
+        const isAltPainting = Math.random() < ALT_PAINTING_CHANCE;
+
+        if (isAltPainting) {
+            painting.src = 'assets/painting1.png';
+            // Смещаем на 1% влево от стандартного значения (например, если было 15%, станет 14%)
+            painting.style.left = 'calc(var(--painting-left, 15%) - 16.2%)';
+        } else {
+            painting.src = 'assets/painting.png';
+            // Возвращаем стандартную позицию
+            painting.style.left = ''; 
+        }
+
+        painting.style.display = 'block';
+    } else {
+        painting.style.display = 'none';
+    }
 });
+

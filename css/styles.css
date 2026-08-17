@@ -2145,3 +2145,91 @@ rgba(0,0,0,.18)
     cursor: pointer;
 }
 
+/* Базовый стиль Люма */
+#lum {
+    top: 4%;
+    left: 5%;
+    width: 10%;
+    transition: filter 0.3s ease, transform 0.3s ease;
+    animation: lumFloatSway 4s ease-in-out infinite;
+    cursor: pointer;
+    transform-origin: top center; 
+}
+
+/* При наведении — яркое свечение и мягкое увеличение */
+#lum:hover {
+    filter: drop-shadow(0 0 25px rgba(255, 255, 150, 0.8)) 
+            drop-shadow(0 0 50px rgba(255, 200, 0, 0.6)) 
+            brightness(1.05) !important;
+    transform: scale(1.05);
+}
+
+/* Еле заметное покачивание и парение (уменьшены градусы и смещение) */
+@keyframes lumFloatSway {
+    0% {
+        transform: translateY(0px) rotate(0deg) skewX(0deg);
+        filter: drop-shadow(0 0 10px rgba(255, 235, 100, 0.7)) 
+                drop-shadow(0 0 20px rgba(255, 180, 0, 0.5));
+    }
+    50% {
+        /* Высота подъема всего 4px, наклон — символические 0.8 градуса */
+        transform: translateY(-4px) rotate(0.8deg) skewX(-0.5deg);
+        filter: drop-shadow(0 0 14px rgba(255, 245, 120, 0.85)) 
+                drop-shadow(0 0 28px rgba(255, 200, 0, 0.65));
+    }
+    100% {
+        transform: translateY(0px) rotate(0deg) skewX(0deg);
+        filter: drop-shadow(0 0 10px rgba(255, 235, 100, 0.7)) 
+                drop-shadow(0 0 20px rgba(255, 180, 0, 0.5));
+    }
+}
+
+/* Анимация сбора при клике */
+#lum.lum-collected {
+    pointer-events: none;
+    animation: lumCollectAnim 0.6s ease-out forwards !important;
+}
+
+@keyframes lumCollectAnim {
+    0% {
+        transform: scale(1) translateY(0);
+        filter: brightness(2) drop-shadow(0 0 30px #ffff00);
+        opacity: 1;
+    }
+    40% {
+        transform: scale(1.2) translateY(-15px);
+        filter: brightness(3) drop-shadow(0 0 50px #ffffff);
+        opacity: 0.9;
+    }
+    100% {
+        transform: scale(0) translateY(-50px);
+        filter: brightness(4) drop-shadow(0 0 60px #ffffaa);
+        opacity: 0;
+    }
+}
+
+
+/* Анимация плавного проявления (материализации) */
+#lum.lum-appearing {
+    pointer-events: none; /* Защита от кликов во время проявления */
+    animation: lumAppearAnim 1.05s ease-out forwards !important;
+}
+
+@keyframes lumAppearAnim {
+    0% {
+        opacity: 0;
+        transform: scale(0.3) translateY(-20px);
+        filter: brightness(1.5) drop-shadow(0 0 40px #ffffff);
+    }
+    60% {
+        opacity: 0.8;
+        transform: scale(1.1) translateY(2px);
+        filter: brightness(1.2) drop-shadow(0 0 30px #ffff77);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: drop-shadow(0 0 10px rgba(255, 235, 100, 0.7)) 
+                drop-shadow(0 0 20px rgba(255, 180, 0, 0.5));
+    }
+}
